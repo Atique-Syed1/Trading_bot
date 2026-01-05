@@ -1,7 +1,7 @@
 import React from 'react';
 import { ShieldCheck, ShieldAlert, TrendingUp, TrendingDown, Radio } from 'lucide-react';
-import { LivePriceCell } from './LivePriceCell';
-import { Sparkline } from './Sparkline';
+import { LivePriceCell } from '../common/LivePriceCell';
+import { Sparkline } from '../common/Sparkline';
 import { WatchlistButton } from './Watchlist';
 
 /**

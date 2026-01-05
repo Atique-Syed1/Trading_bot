@@ -13,14 +13,10 @@ import {
     BarChart2
 } from 'lucide-react';
 
-// Import components
-import { ConnectionStatus } from './components/LivePriceCell';
-import { StockTable } from './components/StockTable';
-import { StockDetailPanel } from './components/StockDetailPanel';
-import { WatchlistPanel, WatchlistIndicator } from './components/Watchlist';
-import { TelegramSettings, TelegramButton } from './components/TelegramSettings';
-import { StockListSettings, StockListButton } from './components/StockListSettings';
-import { ExportButton } from './components/ExportButton';
+// Import components from subfolders
+import { ConnectionStatus, ExportButton } from './components/common';
+import { StockTable, StockDetailPanel, WatchlistPanel, WatchlistIndicator } from './components/scanner';
+import { TelegramSettings, TelegramButton, StockListSettings, StockListButton } from './components/settings';
 
 // Import hooks
 import { useWatchlist, useLocalStorage } from './hooks/useLocalStorage';
@@ -28,9 +24,8 @@ import { useWatchlist, useLocalStorage } from './hooks/useLocalStorage';
 // Import data utilities
 import { generateMockData } from './data/stockData';
 
-// API Configuration
-const API_BASE = 'http://localhost:8000';
-const WS_URL = 'ws://localhost:8000/ws/prices';
+// Import API config
+import API from './config/api';
 
 /**
  * ====================================================================
@@ -58,7 +53,7 @@ const HalalTradeApp = () => {
     useEffect(() => {
         const fetchStockList = async () => {
             try {
-                const response = await fetch(`${API_BASE}/api/stocks/list`);
+                const response = await fetch(API.STOCKS_LIST);
                 const data = await response.json();
                 setStockListInfo(data);
             } catch (err) {
@@ -94,7 +89,7 @@ const HalalTradeApp = () => {
         setErrorMsg('');
 
         try {
-            const ws = new WebSocket(WS_URL);
+            const ws = new WebSocket(API.WS_PRICES);
             wsRef.current = ws;
 
             ws.onopen = () => {
@@ -214,7 +209,7 @@ const HalalTradeApp = () => {
 
         if (useLiveMode) {
             try {
-                const response = await fetch(`${API_BASE}/api/scan`);
+                const response = await fetch(API.SCAN);
                 if (!response.ok) throw new Error('Failed to connect to Local Backend');
 
                 const data = await response.json();

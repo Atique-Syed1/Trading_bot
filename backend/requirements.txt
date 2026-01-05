@@ -1,0 +1,19 @@
+# HalalTrade Pro Backend - Dependencies
+
+# Web Framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+
+# Data & Finance
+yfinance>=0.2.31
+pandas>=2.0.0
+numpy>=1.24.0
+
+# HTTP Client (for Telegram)
+httpx>=0.25.0
+
+# File Upload Support
+python-multipart>=0.0.6
+
+# Optional: For production
+# gunicorn>=21.0.0
