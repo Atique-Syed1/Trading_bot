@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Database, Upload, RefreshCw, X, CheckCircle, XCircle, Loader, FileText, List, Trash2 } from 'lucide-react';
-
-const API_BASE = 'http://localhost:8000';
+import API from '../../config/api';
 
 /**
  * Stock List Settings Modal
@@ -21,7 +20,7 @@ export const StockListSettings = ({ isOpen, onClose, onListChange }) => {
 
     const fetchListInfo = async () => {
         try {
-            const response = await fetch(`${API_BASE}/api/stocks/list`);
+            const response = await fetch(API.STOCKS_LIST);
             const data = await response.json();
             setListInfo(data);
         } catch (err) {
@@ -40,7 +39,7 @@ export const StockListSettings = ({ isOpen, onClose, onListChange }) => {
         formData.append('file', file);
 
         try {
-            const response = await fetch(`${API_BASE}/api/stocks/upload`, {
+            const response = await fetch(API.STOCKS_UPLOAD, {
                 method: 'POST',
                 body: formData
             });
@@ -69,7 +68,7 @@ export const StockListSettings = ({ isOpen, onClose, onListChange }) => {
         setMessage({ type: '', text: '' });
 
         try {
-            const response = await fetch(`${API_BASE}/api/stocks/reset`, {
+            const response = await fetch(API.STOCKS_RESET, {
                 method: 'POST'
             });
 
@@ -119,8 +118,8 @@ export const StockListSettings = ({ isOpen, onClose, onListChange }) => {
                                     <span className="text-white font-medium">{listInfo.name}</span>
                                 </div>
                                 <span className={`text-xs px-2 py-0.5 rounded ${listInfo.source === 'csv' ? 'bg-green-900/30 text-green-400' :
-                                        listInfo.source === 'upload' ? 'bg-blue-900/30 text-blue-400' :
-                                            'bg-gray-700 text-gray-400'
+                                    listInfo.source === 'upload' ? 'bg-blue-900/30 text-blue-400' :
+                                        'bg-gray-700 text-gray-400'
                                     }`}>
                                     {listInfo.source.toUpperCase()}
                                 </span>
@@ -165,8 +164,8 @@ export const StockListSettings = ({ isOpen, onClose, onListChange }) => {
                     {/* Message */}
                     {message.text && (
                         <div className={`p-3 rounded-lg flex items-center gap-2 ${message.type === 'success'
-                                ? 'bg-green-900/30 text-green-400 border border-green-800'
-                                : 'bg-red-900/30 text-red-400 border border-red-800'
+                            ? 'bg-green-900/30 text-green-400 border border-green-800'
+                            : 'bg-red-900/30 text-red-400 border border-red-800'
                             }`}>
                             {message.type === 'success' ? (
                                 <CheckCircle className="w-4 h-4" />

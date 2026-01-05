@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, BellOff, Send, Settings, CheckCircle, XCircle, Loader, X, ExternalLink } from 'lucide-react';
-import { useLocalStorage } from '../hooks/useLocalStorage';
-
-const API_BASE = 'http://localhost:8000';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
+import API from '../../config/api';
 
 /**
  * Telegram Settings Modal
@@ -29,7 +28,7 @@ export const TelegramSettings = ({ isOpen, onClose }) => {
         setMessage({ type: '', text: '' });
 
         try {
-            const response = await fetch(`${API_BASE}/api/telegram/config`, {
+            const response = await fetch(API.TELEGRAM_CONFIG, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -62,7 +61,7 @@ export const TelegramSettings = ({ isOpen, onClose }) => {
 
         try {
             // First save the config
-            await fetch(`${API_BASE}/api/telegram/config`, {
+            await fetch(API.TELEGRAM_CONFIG, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -74,7 +73,7 @@ export const TelegramSettings = ({ isOpen, onClose }) => {
             });
 
             // Then send test message
-            const response = await fetch(`${API_BASE}/api/telegram/test`, {
+            const response = await fetch(API.TELEGRAM_TEST, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -183,8 +182,8 @@ export const TelegramSettings = ({ isOpen, onClose }) => {
                     {/* Message */}
                     {message.text && (
                         <div className={`p-3 rounded-lg flex items-center gap-2 ${message.type === 'success'
-                                ? 'bg-green-900/30 text-green-400 border border-green-800'
-                                : 'bg-red-900/30 text-red-400 border border-red-800'
+                            ? 'bg-green-900/30 text-green-400 border border-green-800'
+                            : 'bg-red-900/30 text-red-400 border border-red-800'
                             }`}>
                             {message.type === 'success' ? (
                                 <CheckCircle className="w-4 h-4" />
@@ -235,8 +234,8 @@ export const TelegramButton = ({ onClick, isEnabled }) => (
     <button
         onClick={onClick}
         className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all ${isEnabled
-                ? 'bg-blue-900/30 text-blue-400 border border-blue-800 hover:bg-blue-900/50'
-                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+            ? 'bg-blue-900/30 text-blue-400 border border-blue-800 hover:bg-blue-900/50'
+            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
             }`}
         title="Configure Telegram Alerts"
     >

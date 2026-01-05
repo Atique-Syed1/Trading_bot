@@ -1,6 +1,6 @@
 import React from 'react';
 import { Download, FileText, FileSpreadsheet } from 'lucide-react';
-import { exportScanResultsCSV, exportScanResultsPDF, exportWatchlistCSV } from '../utils/exportUtils';
+import { exportScanResultsCSV, exportScanResultsPDF, exportWatchlistCSV } from '../../utils/exportUtils';
 
 /**
  * Export Dropdown Button

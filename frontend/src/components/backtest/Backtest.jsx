@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { TrendingUp, TrendingDown, Activity, Calendar, DollarSign, Target, AlertTriangle, Play, Loader, X, BarChart3, Download } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
-import { exportBacktestPDF } from '../utils/exportUtils';
-
-const API_BASE = 'http://localhost:8000';
+import { exportBacktestPDF } from '../../utils/exportUtils';
+import API from '../../config/api';
 
 /**
  * Backtest Modal Component
@@ -44,7 +43,7 @@ export const BacktestModal = ({ isOpen, onClose, symbol, stockName }) => {
         setResults(null);
 
         try {
-            const response = await fetch(`${API_BASE}/api/backtest`, {
+            const response = await fetch(API.BACKTEST, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -109,8 +108,8 @@ export const BacktestModal = ({ isOpen, onClose, symbol, stockName }) => {
                                 key={s.id}
                                 onClick={() => setConfig(prev => ({ ...prev, strategy: s.id }))}
                                 className={`p-3 rounded-lg border text-left transition-all ${config.strategy === s.id
-                                        ? 'bg-orange-900/30 border-orange-600 text-orange-400'
-                                        : 'bg-gray-900 border-gray-700 text-gray-400 hover:border-gray-600'
+                                    ? 'bg-orange-900/30 border-orange-600 text-orange-400'
+                                    : 'bg-gray-900 border-gray-700 text-gray-400 hover:border-gray-600'
                                     }`}
                             >
                                 <div className="text-sm font-bold">{s.name}</div>

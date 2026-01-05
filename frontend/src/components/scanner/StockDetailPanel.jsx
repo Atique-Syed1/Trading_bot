@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { ShieldCheck, ShieldAlert, AlertTriangle, Activity, Radio } from 'lucide-react';
-import { MAX_DEBT_RATIO, MAX_CASH_RATIO } from '../data/stockData';
-import { PriceChart } from './Sparkline';
-import { BacktestModal, BacktestButton } from './Backtest';
+import { AlertTriangle, Activity, Radio } from 'lucide-react';
+import { MAX_DEBT_RATIO, MAX_CASH_RATIO } from '../../data/stockData';
+import { PriceChart } from '../common/Sparkline';
+import { BacktestModal, BacktestButton } from '../backtest/Backtest';
 
 /**
  * Stock Detail Panel - Shows Shariah compliance, chart, and technical analysis
