@@ -32,6 +32,17 @@ export const API = {
     TELEGRAM_TEST: `${API_BASE}/api/telegram/test`,
     TELEGRAM_ALERT: (symbol) => `${API_BASE}/api/telegram/alert/${symbol}`,
 
+    // Portfolio endpoints
+    PORTFOLIO: `${API_BASE}/api/portfolio`,
+    PORTFOLIO_TRANSACTION: `${API_BASE}/api/portfolio/transaction`,
+    PORTFOLIO_TRANSACTIONS: `${API_BASE}/api/portfolio/transactions`,
+
+    // News
+    NEWS: (symbol) => `${API_BASE}/api/news/${symbol}`,
+
+    // AI
+    AI_ANALYZE: (symbol) => `${API_BASE}/api/ai/analyze/${symbol}`,
+
     // Health check
     HEALTH: `${API_BASE}/api/health`,
 

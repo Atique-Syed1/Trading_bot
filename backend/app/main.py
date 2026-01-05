@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .config import API_HOST, API_PORT, CORS_ORIGINS, WS_UPDATE_INTERVAL
 from .services.stock_service import load_csv_stocks, fetch_live_prices
-from .routers import scan, stocks, backtest, telegram
+from .routers import scan, stocks, backtest, telegram, portfolio, alerts, news, ai
 
 
 # ====================================================================
@@ -48,19 +48,43 @@ manager = ConnectionManager()
 # BACKGROUND PRICE UPDATER
 # ====================================================================
 async def price_updater():
-    """Background task to fetch and broadcast live prices"""
+    """Background task to fetch prices, check alerts, and broadcast updates"""
+    from .services import alert_service, telegram_service
+    
     while True:
-        if manager.active_connections:
-            try:
-                prices = await fetch_live_prices()
-                if prices:
+        try:
+            # Fetch live prices even if no clients connected (for alerts)
+            # But optimize: if no clients and no alerts, maybe snooze?
+            # For now, keep running
+            prices = await fetch_live_prices()
+            
+            if prices:
+                # 1. Check Alerts
+                try:
+                    triggered = alert_service.check_alerts(prices)
+                    for alert in triggered:
+                        print(f"🔔 ALERT TRIGGERED: {alert['symbol']} {alert['condition']} {alert['price']}")
+                        # Send telegram notification
+                        try:
+                            msg = (f"🔔 *PRICE ALERT*\n\n"
+                                   f"*{alert['symbol']}* is {alert['condition']}\n"
+                                   f"Target: ₹{alert['price']}\n"
+                                   f"Current: ₹{prices.get(alert['symbol'], 0)}")
+                            await telegram_service.send_telegram_alert(msg)
+                        except Exception as tg_err:
+                            print(f"[Alert] Telegram failed: {tg_err}")
+                except Exception as alert_err:
+                    print(f"[Alert] Check failed: {alert_err}")
+
+                # 2. Broadcast to WebSocket clients
+                if manager.active_connections:
                     await manager.broadcast({
                         "type": "price_update",
                         "data": prices
                     })
-                    print(f"[WS] Broadcasted {len(prices)} price updates")
-            except Exception as e:
-                print(f"[WS] Price update error: {e}")
+                    print(f"[WS] Broadcasted updates")
+        except Exception as e:
+            print(f"[Data] Update cycle error: {e}")
         
         await asyncio.sleep(WS_UPDATE_INTERVAL)
 
@@ -115,6 +139,10 @@ app.include_router(scan.router)
 app.include_router(stocks.router)
 app.include_router(backtest.router)
 app.include_router(telegram.router)
+app.include_router(portfolio.router)
+app.include_router(alerts.router)
+app.include_router(news.router)
+app.include_router(ai.router)
 
 
 # ====================================================================

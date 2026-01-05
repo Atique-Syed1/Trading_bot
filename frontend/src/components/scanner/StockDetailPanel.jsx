@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
-import { AlertTriangle, Activity, Radio } from 'lucide-react';
+import { AlertTriangle, Activity, Radio, BarChart2, Newspaper, Bot } from 'lucide-react';
 import { MAX_DEBT_RATIO, MAX_CASH_RATIO } from '../../data/stockData';
 import { PriceChart } from '../common/Sparkline';
 import { BacktestModal, BacktestButton } from '../backtest/Backtest';
+import { NewsPanel } from './NewsPanel';
+import { AIAnalystModal } from './AIAnalyst';
 
 /**
  * Stock Detail Panel - Shows Shariah compliance, chart, and technical analysis
  */
 export const StockDetailPanel = ({ stock, useLiveMode, wsConnected }) => {
     const [backtestOpen, setBacktestOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState('analysis');
+    const [aiOpen, setAiOpen] = useState(false);
 
     if (!stock) return null;
 
@@ -25,42 +29,82 @@ export const StockDetailPanel = ({ stock, useLiveMode, wsConnected }) => {
                         </span>
                     </div>
                 </div>
-                <div className="text-right">
+                <div className="text-right flex flex-col items-end gap-2">
                     <div className="text-3xl font-bold text-white">₹{stock.price.toFixed(1)}</div>
+
+                    {/* AI Button */}
+                    <button
+                        onClick={() => setAiOpen(true)}
+                        className="flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold rounded-full shadow-lg shadow-purple-900/40 transition-all transform hover:scale-105"
+                    >
+                        <Bot className="w-3 h-3" /> Ask AI
+                    </button>
+
                     {useLiveMode && wsConnected && (
-                        <div className="text-xs text-green-400 animate-pulse mt-1 flex items-center justify-end gap-1">
+                        <div className="text-xs text-green-400 animate-pulse flex items-center justify-end gap-1">
                             <Radio className="w-3 h-3" /> Live Data
                         </div>
                     )}
                 </div>
             </div>
 
+            {/* AI Modal */}
+            <AIAnalystModal
+                isOpen={aiOpen}
+                onClose={() => setAiOpen(false)}
+                stock={stock}
+            />
+
             {/* Price Chart */}
             {stock.priceHistory && stock.priceHistory.length > 0 && (
-                <div className="mb-4">
+                <div className="mb-6">
                     <PriceChart data={stock.priceHistory} height={100} />
                 </div>
             )}
 
-            {/* Shariah Compliance Report */}
-            <ShariahReport stock={stock} />
+            {/* Tabs */}
+            <div className="flex gap-2 mb-6 bg-gray-900/50 p-1 rounded-lg">
+                <button
+                    onClick={() => setActiveTab('analysis')}
+                    className={`flex-1 py-2 text-sm font-medium rounded-md flex items-center justify-center gap-2 transition-all ${activeTab === 'analysis' ? 'bg-gray-700 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
+                >
+                    <BarChart2 className="w-4 h-4" /> Analysis
+                </button>
+                <button
+                    onClick={() => setActiveTab('news')}
+                    className={`flex-1 py-2 text-sm font-medium rounded-md flex items-center justify-center gap-2 transition-all ${activeTab === 'news' ? 'bg-gray-700 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
+                >
+                    <Newspaper className="w-4 h-4" /> News
+                </button>
+            </div>
 
-            {/* Technical Analysis */}
-            {stock.shariahStatus === 'Halal' ? (
+            {activeTab === 'analysis' ? (
                 <>
-                    <TechnicalAnalysis stock={stock} />
+                    {/* Shariah Compliance Report */}
+                    <ShariahReport stock={stock} />
 
-                    {/* Backtest Button */}
-                    <div className="mt-4 pt-4 border-t border-gray-700">
-                        <BacktestButton onClick={() => setBacktestOpen(true)} />
-                    </div>
+                    {/* Technical Analysis */}
+                    {stock.shariahStatus === 'Halal' ? (
+                        <>
+                            <TechnicalAnalysis stock={stock} />
+
+                            {/* Backtest Button */}
+                            <div className="mt-4 pt-4 border-t border-gray-700">
+                                <BacktestButton onClick={() => setBacktestOpen(true)} />
+                            </div>
+                        </>
+                    ) : (
+                        <div className="bg-red-900/10 border border-red-900/50 p-4 rounded-lg flex items-center gap-3 text-red-200">
+                            <AlertTriangle className="w-5 h-5" />
+                            <p className="text-sm">Technical analysis is disabled for Non-Halal stocks.</p>
+                        </div>
+                    )}
                 </>
             ) : (
-                <div className="bg-red-900/10 border border-red-900/50 p-4 rounded-lg flex items-center gap-3 text-red-200">
-                    <AlertTriangle className="w-5 h-5" />
-                    <p className="text-sm">Technical analysis is disabled for Non-Halal stocks.</p>
-                </div>
+                /* News Panel */
+                <NewsPanel symbol={stock.symbol} />
             )}
+
 
             {/* Backtest Modal */}
             <BacktestModal

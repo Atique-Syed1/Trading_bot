@@ -1,0 +1,17 @@
+{
+  "transactions": [
+    {
+      "symbol": "RELIANANCE",
+      "type": "BUY",
+      "quantity": 6,
+      "price": 200.0,
+      "date": "2026-01-05"
+    }
+  ],
+  "holdings": {
+    "RELIANANCE": {
+      "quantity": 6,
+      "total_cost": 1200.0
+    }
+  }
+}

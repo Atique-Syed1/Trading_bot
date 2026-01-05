@@ -15,8 +15,9 @@ import {
 
 // Import components from subfolders
 import { ConnectionStatus, ExportButton } from './components/common';
-import { StockTable, StockDetailPanel, WatchlistPanel, WatchlistIndicator } from './components/scanner';
-import { TelegramSettings, TelegramButton, StockListSettings, StockListButton } from './components/settings';
+import { StockTable, StockDetailPanel, WatchlistPanel, WatchlistIndicator, CompareStocks } from './components/scanner';
+import { TelegramSettings, TelegramButton, StockListSettings, StockListButton, AlertSettings } from './components/settings';
+import { Portfolio } from './components/portfolio';
 
 // Import hooks
 import { useWatchlist, useLocalStorage } from './hooks/useLocalStorage';
@@ -44,6 +45,9 @@ const HalalTradeApp = () => {
     const [watchlistOpen, setWatchlistOpen] = useState(false);
     const [telegramOpen, setTelegramOpen] = useState(false);
     const [stockListOpen, setStockListOpen] = useState(false);
+    const [portfolioOpen, setPortfolioOpen] = useState(false);
+    const [alertOpen, setAlertOpen] = useState(false);
+    const [compareOpen, setCompareOpen] = useState(false);
     const [stockListInfo, setStockListInfo] = useState({ count: 25, name: 'Default' });
 
     // Telegram config from localStorage
@@ -256,6 +260,9 @@ const HalalTradeApp = () => {
                 onOpenTelegram={() => setTelegramOpen(true)}
                 stockListCount={stockListInfo.count}
                 onOpenStockList={() => setStockListOpen(true)}
+                onOpenPortfolio={() => setPortfolioOpen(true)}
+                onOpenAlerts={() => setAlertOpen(true)}
+                onOpenCompare={() => setCompareOpen(true)}
                 stocks={stocks}
             />
 
@@ -323,6 +330,25 @@ const HalalTradeApp = () => {
                         .then(data => setStockListInfo(data));
                 }}
             />
+
+            {/* PORTFOLIO MODAL */}
+            <Portfolio
+                isOpen={portfolioOpen}
+                onClose={() => setPortfolioOpen(false)}
+            />
+
+            {/* ALERTS MODAL */}
+            <AlertSettings
+                isOpen={alertOpen}
+                onClose={() => setAlertOpen(false)}
+            />
+
+            {/* COMPARE MODAL */}
+            <CompareStocks
+                isOpen={compareOpen}
+                onClose={() => setCompareOpen(false)}
+                stocks={stocks}
+            />
         </div>
     );
 };
@@ -338,6 +364,7 @@ const Header = ({
     watchlistCount, onOpenWatchlist,
     telegramEnabled, onOpenTelegram,
     stockListCount, onOpenStockList,
+    onOpenPortfolio, onOpenAlerts, onOpenCompare,
     stocks
 }) => (
     <div className="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -366,6 +393,32 @@ const Header = ({
                 onClick={onOpenStockList}
                 count={stockListCount}
             />
+
+            {/* Alerts Button */}
+            <button
+                onClick={onOpenAlerts}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all bg-gray-800 text-gray-400 hover:bg-gray-700 border border-gray-700"
+            >
+                <div className="md:hidden">🔔</div>
+                <span className="hidden md:inline">Alerts</span>
+            </button>
+
+            <button
+                onClick={onOpenCompare}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all bg-gray-800 text-gray-400 hover:bg-gray-700 border border-gray-700"
+            >
+                <div className="md:hidden">⚖️</div>
+                <span className="hidden md:inline">Compare</span>
+            </button>
+
+            {/* Portfolio Button */}
+            <button
+                onClick={onOpenPortfolio}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all bg-gray-800 text-gray-400 hover:bg-gray-700 border border-gray-700"
+            >
+                <div className="md:hidden">💼</div>
+                <span className="hidden md:inline">Portfolio</span>
+            </button>
 
             {/* Telegram Button */}
             <TelegramButton

@@ -235,3 +235,9 @@ def reset_stock_list():
         "symbols": DEFAULT_STOCKS.copy(),
         "source": "default"
     }
+
+
+def get_all_stocks() -> list:
+    """Get all cached stock data for portfolio valuation"""
+    return list(cached_stock_data.values())
+
