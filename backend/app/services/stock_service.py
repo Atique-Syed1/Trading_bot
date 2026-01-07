@@ -25,6 +25,8 @@ active_stock_list = {
 }
 stock_metadata = {}
 cached_stock_data = {}
+live_prices = {} # New: global cache for live prices
+
 
 
 def load_csv_stocks() -> bool:
@@ -174,16 +176,17 @@ def scan_stocks() -> list:
     return results
 
 
-async def fetch_live_prices() -> dict:
-    """Fetch live prices for all active stocks"""
+async def fetch_live_prices(custom_symbols: list = None) -> dict:
+    """Fetch live prices for all active stocks or custom list"""
+    global live_prices
     import asyncio
     
-    symbols = active_stock_list["symbols"]
+    input_symbols = custom_symbols if custom_symbols is not None else active_stock_list["symbols"]
     prices = {}
     
     # Batch processing
-    for i in range(0, len(symbols), WS_BATCH_SIZE):
-        batch = symbols[i:i + WS_BATCH_SIZE]
+    for i in range(0, len(input_symbols), WS_BATCH_SIZE):
+        batch = input_symbols[i:i + WS_BATCH_SIZE]
         try:
             tickers = yf.Tickers(" ".join(batch))
             for symbol in batch:
@@ -193,17 +196,20 @@ async def fetch_live_prices() -> dict:
                         hist = ticker.history(period="1d")
                         if not hist.empty:
                             clean = symbol.replace('.NS', '')
-                            prices[clean] = round(float(hist['Close'].iloc[-1]), 2)
+                            price = round(float(hist['Close'].iloc[-1]), 2)
+                            prices[clean] = price
+                            live_prices[clean] = price # Update global cache
                 except Exception:
                     continue
         except Exception as e:
             print(f"Batch error: {e}")
         
         # Small delay between batches
-        if i + WS_BATCH_SIZE < len(symbols):
+        if i + WS_BATCH_SIZE < len(input_symbols):
             await asyncio.sleep(0.5)
     
     return prices
+
 
 
 def get_stock_list_info() -> dict:
@@ -212,7 +218,7 @@ def get_stock_list_info() -> dict:
         "name": active_stock_list["name"],
         "count": len(active_stock_list["symbols"]),
         "source": active_stock_list["source"],
-        "symbols": [s.replace(".NS", "") for s in active_stock_list["symbols"][:50]]
+        "symbols": [s.replace(".NS", "") for s in active_stock_list["symbols"]]
     }
 
 

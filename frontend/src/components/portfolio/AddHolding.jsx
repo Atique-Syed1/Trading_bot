@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Save, Loader } from 'lucide-react';
 import API from '../../config/api';
 
@@ -10,11 +10,34 @@ export const AddHoldingModal = ({ isOpen, onClose, onSuccess }) => {
         price: '',
         date: new Date().toISOString().split('T')[0]
     });
+    const [availableSymbols, setAvailableSymbols] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
 
+    useEffect(() => {
+        if (isOpen) {
+            const fetchSymbols = async () => {
+                try {
+                    const response = await fetch(API.STOCKS_LIST);
+                    const data = await response.json();
+                    setAvailableSymbols(data.symbols || []);
+                } catch (err) {
+                    console.error("Failed to fetch symbols", err);
+                }
+            };
+            fetchSymbols();
+        }
+    }, [isOpen]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Final Validation
+        if (!availableSymbols.includes(formData.symbol)) {
+            setError(`"${formData.symbol}" is not a valid stock in our list. Please select one from the suggestions.`);
+            return;
+        }
+
         setIsSubmitting(true);
         setError('');
 
@@ -67,11 +90,19 @@ export const AddHoldingModal = ({ isOpen, onClose, onSuccess }) => {
                         <input
                             type="text"
                             required
+                            list="symbol-list"
+                            pattern="^[A-Z0-9.]+$"
+                            title="Only uppercase letters, numbers, and periods allowed"
                             className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white uppercase"
                             placeholder="e.g. RELIANCE"
                             value={formData.symbol}
-                            onChange={(e) => setFormData({ ...formData, symbol: e.target.value.toUpperCase() })}
+                            onChange={(e) => setFormData({ ...formData, symbol: e.target.value.toUpperCase().replace(/[^A-Z0-9.]/g, '') })}
                         />
+                        <datalist id="symbol-list">
+                            {availableSymbols.map(s => (
+                                <option key={s} value={s} />
+                            ))}
+                        </datalist>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">

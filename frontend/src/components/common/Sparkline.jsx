@@ -39,25 +39,28 @@ export const Sparkline = ({
 
     return (
         <div style={{ width, height }} className="relative">
-            <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
-                    <defs>
-                        <linearGradient id={`gradient-${trendColor.replace('#', '')}`} x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={trendColor} stopOpacity={0.3} />
-                            <stop offset="100%" stopColor={trendColor} stopOpacity={0} />
-                        </linearGradient>
-                    </defs>
-                    <YAxis domain={[minValue, maxValue]} hide />
-                    <Line
-                        type="monotone"
-                        dataKey="value"
-                        stroke={trendColor}
-                        strokeWidth={1.5}
-                        dot={false}
-                        isAnimationActive={false}
-                    />
-                </LineChart>
-            </ResponsiveContainer>
+            <LineChart
+                data={chartData}
+                width={width}
+                height={height}
+                margin={{ top: 2, right: 2, bottom: 2, left: 2 }}
+            >
+                <defs>
+                    <linearGradient id={`gradient-${trendColor.replace('#', '')}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={trendColor} stopOpacity={0.3} />
+                        <stop offset="100%" stopColor={trendColor} stopOpacity={0} />
+                    </linearGradient>
+                </defs>
+                <YAxis domain={[minValue, maxValue]} hide />
+                <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke={trendColor}
+                    strokeWidth={1.5}
+                    dot={false}
+                    isAnimationActive={false}
+                />
+            </LineChart>
 
             {/* Trend indicator dot */}
             <div
@@ -103,7 +106,7 @@ export const PriceChart = ({
                     {lastPrice >= firstPrice ? '+' : ''}{changePercent}%
                 </span>
             </div>
-            <div style={{ width, height }}>
+            <div style={{ width, height, minWidth: 200, minHeight: 120 }}>
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={chartData} margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
                         <defs>

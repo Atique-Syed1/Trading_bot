@@ -18,8 +18,8 @@ export const WatchlistButton = ({ isWatched, onClick, size = 'md' }) => {
                 onClick();
             }}
             className={`p-1 rounded-full transition-all duration-200 ${isWatched
-                    ? 'text-yellow-400 hover:text-yellow-300 bg-yellow-900/20'
-                    : 'text-gray-500 hover:text-yellow-400 hover:bg-gray-700'
+                ? 'text-yellow-400 hover:text-yellow-300 bg-yellow-900/20'
+                : 'text-gray-500 hover:text-yellow-400 hover:bg-gray-700'
                 }`}
             title={isWatched ? 'Remove from Watchlist' : 'Add to Watchlist'}
         >
@@ -115,8 +115,8 @@ export const WatchlistPanel = ({
                                             <div className="flex items-center gap-2">
                                                 <span className="font-bold text-white">{item.symbol}</span>
                                                 <span className={`text-xs px-1.5 py-0.5 rounded ${item.shariahStatus === 'Halal'
-                                                        ? 'bg-emerald-900/30 text-emerald-400'
-                                                        : 'bg-red-900/30 text-red-400'
+                                                    ? 'bg-emerald-900/30 text-emerald-400'
+                                                    : 'bg-red-900/30 text-red-400'
                                                     }`}>
                                                     {item.shariahStatus}
                                                 </span>
@@ -151,10 +151,10 @@ export const WatchlistPanel = ({
                                         {/* Signal */}
                                         {item.technicals && (
                                             <div className={`text-xs font-bold px-2 py-1 rounded ${item.technicals.signal === 'Buy'
-                                                    ? 'bg-green-900/30 text-green-400'
-                                                    : item.technicals.signal === 'Sell'
-                                                        ? 'bg-red-900/30 text-red-400'
-                                                        : 'bg-gray-700 text-gray-400'
+                                                ? 'bg-green-900/30 text-green-400'
+                                                : item.technicals.signal === 'Sell'
+                                                    ? 'bg-red-900/30 text-red-400'
+                                                    : 'bg-gray-700 text-gray-400'
                                                 }`}>
                                                 {item.technicals.signal.toUpperCase()}
                                             </div>
@@ -180,7 +180,7 @@ export const WatchlistPanel = ({
                 {/* Footer */}
                 <div className="p-3 border-t border-gray-700 bg-gray-900/50 text-center">
                     <p className="text-xs text-gray-500">
-                        💾 Saved locally • Synced across browser sessions
+                        ☁️ Saved in database • Synced on all devices
                     </p>
                 </div>
             </div>
@@ -195,8 +195,8 @@ export const WatchlistIndicator = ({ count, onClick }) => (
     <button
         onClick={onClick}
         className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all ${count > 0
-                ? 'bg-yellow-900/30 text-yellow-400 border border-yellow-800 hover:bg-yellow-900/50'
-                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+            ? 'bg-yellow-900/30 text-yellow-400 border border-yellow-800 hover:bg-yellow-900/50'
+            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
             }`}
     >
         <Star className={`w-4 h-4 ${count > 0 ? 'fill-yellow-400' : ''}`} />

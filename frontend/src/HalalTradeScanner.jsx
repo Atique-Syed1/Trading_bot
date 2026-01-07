@@ -20,7 +20,8 @@ import { TelegramSettings, TelegramButton, StockListSettings, StockListButton, A
 import { Portfolio } from './components/portfolio';
 
 // Import hooks
-import { useWatchlist, useLocalStorage } from './hooks/useLocalStorage';
+import { useWatchlist } from './hooks/useWatchlist';
+
 
 // Import data utilities
 import { generateMockData } from './data/stockData';
@@ -42,30 +43,41 @@ const HalalTradeApp = () => {
     const [showHalalOnly, setShowHalalOnly] = useState(false);
     const [selectedStock, setSelectedStock] = useState(null);
     const [errorMsg, setErrorMsg] = useState('');
+
+    // UI state
     const [watchlistOpen, setWatchlistOpen] = useState(false);
     const [telegramOpen, setTelegramOpen] = useState(false);
     const [stockListOpen, setStockListOpen] = useState(false);
     const [portfolioOpen, setPortfolioOpen] = useState(false);
     const [alertOpen, setAlertOpen] = useState(false);
     const [compareOpen, setCompareOpen] = useState(false);
-    const [stockListInfo, setStockListInfo] = useState({ count: 25, name: 'Default' });
 
-    // Telegram config from localStorage
-    const [telegramConfig] = useLocalStorage('halaltrade_telegram', { enabled: false });
+    // Data state
+    const [universeInfo, setUniverseInfo] = useState({ count: 25, name: 'Default' });
+    const [telegramEnabled, setTelegramEnabled] = useState(false);
 
-    // Fetch stock list info on mount
+
+
+    // Fetch basic info on mount
     useEffect(() => {
-        const fetchStockList = async () => {
+        const fetchInitialData = async () => {
             try {
-                const response = await fetch(API.STOCKS_LIST);
-                const data = await response.json();
-                setStockListInfo(data);
+                // Fetch stock list info
+                const stockRes = await fetch(API.STOCKS_LIST);
+                const stockData = await stockRes.json();
+                setUniverseInfo(stockData);
+
+                // Fetch telegram status
+                const tgRes = await fetch(API.TELEGRAM_CONFIG);
+                const tgData = await tgRes.json();
+                setTelegramEnabled(tgData.enabled && tgData.configured);
             } catch (err) {
-                // Backend not available yet
+                console.error("Failed to fetch initial data", err);
             }
         };
-        fetchStockList();
+        fetchInitialData();
     }, []);
+
 
     // Watchlist hook
     const {
@@ -256,9 +268,10 @@ const HalalTradeApp = () => {
                 lastUpdate={lastUpdate}
                 watchlistCount={watchlistCount}
                 onOpenWatchlist={() => setWatchlistOpen(true)}
-                telegramEnabled={telegramConfig.enabled}
+                telegramEnabled={telegramEnabled}
                 onOpenTelegram={() => setTelegramOpen(true)}
-                stockListCount={stockListInfo.count}
+
+                stockListCount={universeInfo.count}
                 onOpenStockList={() => setStockListOpen(true)}
                 onOpenPortfolio={() => setPortfolioOpen(true)}
                 onOpenAlerts={() => setAlertOpen(true)}
@@ -323,12 +336,16 @@ const HalalTradeApp = () => {
             <StockListSettings
                 isOpen={stockListOpen}
                 onClose={() => setStockListOpen(false)}
-                onListChange={() => {
-                    // Refresh stock list info
-                    fetch(`${API_BASE}/api/stocks/list`)
-                        .then(res => res.json())
-                        .then(data => setStockListInfo(data));
+                onListChange={async () => {
+                    try {
+                        const res = await fetch(API.STOCKS_LIST);
+                        const data = await res.json();
+                        setUniverseInfo(data);
+                    } catch (err) {
+                        console.error("Failed to refresh stock list info", err);
+                    }
                 }}
+
             />
 
             {/* PORTFOLIO MODAL */}

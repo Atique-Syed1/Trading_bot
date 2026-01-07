@@ -1,15 +1,16 @@
-import json
-import os
-from datetime import datetime
 from typing import List, Dict, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from sqlmodel import Session, select
+from ..models import Transaction as DBTransaction
+from datetime import datetime
+from .stock_service import stock_metadata
 
-# Data models
-class Transaction(BaseModel):
+# Input Models (Pydantic)
+class TransactionCreate(BaseModel):
     symbol: str
     type: str  # BUY or SELL
-    quantity: int
-    price: float
+    quantity: int = Field(..., gt=0, description="Quantity must be positive")
+    price: float = Field(..., gt=0, description="Price must be positive")
     date: str
 
 class Holding(BaseModel):
@@ -28,72 +29,78 @@ class PortfolioSummary(BaseModel):
     total_pnl_percent: float = 0.0
     holdings: List[Holding] = []
 
-# File path for storing portfolio data (mock database)
-PORTFOLIO_FILE = os.path.join("data", "portfolio.json")
+def add_transaction(transaction: TransactionCreate, session: Session) -> bool:
+    # Validate symbol exists in our universe
+    if transaction.symbol not in stock_metadata:
+        return False
+        
+    # Validate sell quantity
+    if transaction.type == "SELL":
+        # Calculate current qty to ensure we can sell
+        current_qty = _get_holding_qty(transaction.symbol, session)
+        if current_qty < transaction.quantity:
+            return False
 
-# Ensure data directory exists
-os.makedirs("data", exist_ok=True)
-
-def _load_data() -> Dict:
-    if os.path.exists(PORTFOLIO_FILE):
-        try:
-            with open(PORTFOLIO_FILE, 'r') as f:
-                return json.load(f)
-        except:
-            return {"transactions": [], "holdings": {}}
-    return {"transactions": [], "holdings": {}}
-
-def _save_data(data: Dict):
-    with open(PORTFOLIO_FILE, 'w') as f:
-        json.dump(data, f, indent=2)
-
-def add_transaction(transaction: Transaction) -> bool:
-    data = _load_data()
-    
-    # Add transaction record
-    data["transactions"].append(transaction.dict())
-    
-    # Update holdings
-    symbol = transaction.symbol
-    holdings = data.get("holdings", {})
-    
-    if symbol not in holdings:
-        holdings[symbol] = {"quantity": 0, "total_cost": 0.0}
-    
-    current = holdings[symbol]
-    
-    if transaction.type == "BUY":
-        current["quantity"] += transaction.quantity
-        current["total_cost"] += (transaction.quantity * transaction.price)
-    elif transaction.type == "SELL":
-        # FIFO or Weighted Avg logic could go here, for now simple reduction
-        if current["quantity"] >= transaction.quantity:
-            cost_per_share = current["total_cost"] / current["quantity"] if current["quantity"] > 0 else 0
-            current["quantity"] -= transaction.quantity
-            current["total_cost"] -= (transaction.quantity * cost_per_share)
-        else:
-            return False # Cannot sell more than owned
-            
-    # Clean up empty holdings
-    if current["quantity"] <= 0:
-        del holdings[symbol]
-    
-    data["holdings"] = holdings
-    _save_data(data)
+    db_txn = DBTransaction(
+        symbol=transaction.symbol,
+        type=transaction.type,
+        quantity=transaction.quantity,
+        price=transaction.price,
+        date=transaction.date
+    )
+    session.add(db_txn)
+    session.commit()
+    session.refresh(db_txn)
     return True
 
-def get_portfolio(current_prices: Dict[str, float]) -> PortfolioSummary:
-    data = _load_data()
-    holdings_dict = data.get("holdings", {})
+def _get_holding_qty(symbol: str, session: Session) -> int:
+    txns = session.exec(select(DBTransaction).where(DBTransaction.symbol == symbol)).all()
+    qty = 0
+    for t in txns:
+        if t.type == "BUY":
+            qty += t.quantity
+        else:
+            qty -= t.quantity
+    return qty
+
+def get_portfolio(current_prices: Dict[str, float], session: Session) -> PortfolioSummary:
+    # Fetch all transactions
+    txns = session.exec(select(DBTransaction)).all()
     
+    # Calculate holdings in memory
+    holdings_map = {} # symbol -> {qty, total_cost}
+    
+    for t in txns:
+        if t.symbol not in holdings_map:
+            holdings_map[t.symbol] = {"qty": 0, "cost": 0.0}
+            
+        h = holdings_map[t.symbol]
+        
+        if t.type == "BUY":
+            h["qty"] += t.quantity
+            h["cost"] += (t.quantity * t.price)
+        elif t.type == "SELL":
+            if h["qty"] > 0:
+                avg_cost = h["cost"] / h["qty"]
+                h["qty"] -= t.quantity
+                h["cost"] -= (t.quantity * avg_cost)
+            else:
+                current_qty = h["qty"]
+                # If short selling logic isn't desired, we handle 0 check above
+                h["qty"] -= t.quantity 
+    
+    # Build Summary
     summary = PortfolioSummary()
     
-    for symbol, info in holdings_dict.items():
-        qty = info["quantity"]
-        total_cost = info["total_cost"]
-        avg_price = total_cost / qty if qty > 0 else 0
+    for symbol, h in holdings_map.items():
+        qty = h["qty"]
+        if qty <= 0:
+            continue
+            
+        total_cost = h["cost"]
+        avg_price = total_cost / qty
         
-        # Get live price or fallback to avg price (no gain/loss)
+        # Get live price
         curr_price = current_prices.get(symbol, avg_price)
         
         curr_value = qty * curr_price
@@ -113,12 +120,19 @@ def get_portfolio(current_prices: Dict[str, float]) -> PortfolioSummary:
         summary.holdings.append(holding)
         summary.total_invested += total_cost
         summary.current_value += curr_value
-    
+        
     summary.total_pnl = summary.current_value - summary.total_invested
     summary.total_pnl_percent = (summary.total_pnl / summary.total_invested * 100) if summary.total_invested > 0 else 0
     
     return summary
 
-def get_transactions() -> List[Dict]:
-    data = _load_data()
-    return data.get("transactions", [])
+def get_transactions(session: Session) -> List[DBTransaction]:
+    return session.exec(select(DBTransaction)).all()
+
+def delete_transaction(transaction_id: int, session: Session) -> bool:
+    txn = session.get(DBTransaction, transaction_id)
+    if txn:
+        session.delete(txn)
+        session.commit()
+        return True
+    return False

@@ -1,36 +1,46 @@
-"""
-Telegram Service - Telegram bot integration for alerts
-"""
 import httpx
 from typing import Optional
+from sqlmodel import Session
+from . import settings_service
+from ..database import engine
 
-from ..config import TELEGRAM_CONFIG
-
-
-def configure_telegram(bot_token: str, chat_id: str, enabled: bool = True):
+def configure_telegram(bot_token: str, chat_id: str, enabled: bool, session: Session):
     """Configure Telegram bot settings"""
-    TELEGRAM_CONFIG["bot_token"] = bot_token
-    TELEGRAM_CONFIG["chat_id"] = chat_id
-    TELEGRAM_CONFIG["enabled"] = enabled
+    settings_service.set_setting("tg_bot_token", bot_token, session)
+    settings_service.set_setting("tg_chat_id", chat_id, session)
+    settings_service.set_setting("tg_enabled", "true" if enabled else "false", session)
 
-
-def get_telegram_config() -> dict:
+def get_telegram_config(session: Session) -> dict:
     """Get current Telegram configuration (masked)"""
+    token = settings_service.get_setting("tg_bot_token", session)
+    chat_id = settings_service.get_setting("tg_chat_id", session)
+    enabled = settings_service.get_setting("tg_enabled", session) == "true"
+    
     return {
-        "enabled": TELEGRAM_CONFIG["enabled"],
-        "configured": bool(TELEGRAM_CONFIG["bot_token"] and TELEGRAM_CONFIG["chat_id"]),
-        "chat_id": TELEGRAM_CONFIG["chat_id"][-4:] if TELEGRAM_CONFIG["chat_id"] else None
+        "enabled": enabled,
+        "configured": bool(token and chat_id),
+        "chat_id": chat_id[-4:] if chat_id else None
     }
 
-
-async def send_telegram_message(message: str) -> dict:
+async def send_telegram_message(message: str, session: Optional[Session] = None) -> dict:
     """Send a message via Telegram Bot API"""
-    if not TELEGRAM_CONFIG["bot_token"] or not TELEGRAM_CONFIG["chat_id"]:
-        return {"success": False, "error": "Telegram not configured"}
+    if session:
+        token = settings_service.get_setting("tg_bot_token", session)
+        chat_id = settings_service.get_setting("tg_chat_id", session)
+        enabled = settings_service.get_setting("tg_enabled", session) == "true"
+    else:
+        # Fallback to creating a one-off session if none provided
+        with Session(engine) as session:
+            token = settings_service.get_setting("tg_bot_token", session)
+            chat_id = settings_service.get_setting("tg_chat_id", session)
+            enabled = settings_service.get_setting("tg_enabled", session) == "true"
+
+    if not enabled or not token or not chat_id:
+        return {"success": False, "error": "Telegram not configured or disabled"}
     
-    url = f"https://api.telegram.org/bot{TELEGRAM_CONFIG['bot_token']}/sendMessage"
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
     payload = {
-        "chat_id": TELEGRAM_CONFIG["chat_id"],
+        "chat_id": chat_id,
         "text": message,
         "parse_mode": "HTML"
     }
@@ -48,8 +58,7 @@ async def send_telegram_message(message: str) -> dict:
     except Exception as e:
         return {"success": False, "error": str(e)}
 
-
-async def send_test_message() -> dict:
+async def send_test_message(session: Session) -> dict:
     """Send a test message to verify Telegram setup"""
     message = """
 🔔 <b>HalalTrade Pro Alert Test</b>
@@ -63,8 +72,7 @@ You will receive alerts when:
 
 <i>Configured from HalalTrade Pro Dashboard</i>
 """
-    return await send_telegram_message(message.strip())
-
+    return await send_telegram_message(message.strip(), session)
 
 async def send_stock_alert(
     symbol: str,
@@ -73,12 +81,10 @@ async def send_stock_alert(
     signal: str,
     rsi: float,
     target: Optional[float] = None,
-    stop_loss: Optional[float] = None
+    stop_loss: Optional[float] = None,
+    session: Optional[Session] = None
 ) -> dict:
     """Send a stock alert via Telegram"""
-    if not TELEGRAM_CONFIG["enabled"]:
-        return {"success": False, "error": "Telegram alerts disabled"}
-    
     emoji = "🟢" if signal == "Buy" else "🔴" if signal == "Sell" else "🟡"
     
     message = f"""
@@ -97,13 +103,17 @@ async def send_stock_alert(
     
     message += "\n<i>— HalalTrade Pro</i>"
     
-    return await send_telegram_message(message.strip())
+    return await send_telegram_message(message.strip(), session)
 
+async def send_telegram_alert(message: str, session: Optional[Session] = None) -> dict:
+    """Explicitly send a telegram alert (alias for send_telegram_message)"""
+    return await send_telegram_message(message, session)
 
-def is_telegram_enabled() -> bool:
+def is_telegram_enabled(session: Session) -> bool:
+
     """Check if Telegram is enabled and configured"""
-    return (
-        TELEGRAM_CONFIG["enabled"] and
-        bool(TELEGRAM_CONFIG["bot_token"]) and
-        bool(TELEGRAM_CONFIG["chat_id"])
-    )
+    token = settings_service.get_setting("tg_bot_token", session)
+    chat_id = settings_service.get_setting("tg_chat_id", session)
+    enabled = settings_service.get_setting("tg_enabled", session) == "true"
+    return enabled and bool(token) and bool(chat_id)
+

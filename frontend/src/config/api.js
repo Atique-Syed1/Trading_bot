@@ -35,13 +35,23 @@ export const API = {
     // Portfolio endpoints
     PORTFOLIO: `${API_BASE}/api/portfolio`,
     PORTFOLIO_TRANSACTION: `${API_BASE}/api/portfolio/transaction`,
+    PORTFOLIO_DELETE_TRANSACTION: (id) => `${API_BASE}/api/portfolio/transaction/${id}`,
     PORTFOLIO_TRANSACTIONS: `${API_BASE}/api/portfolio/transactions`,
 
     // News
     NEWS: (symbol) => `${API_BASE}/api/news/${symbol}`,
 
+    // Alerts
+    ALERTS: `${API_BASE}/api/alerts`,
+    ALERT_ITEM: (id) => `${API_BASE}/api/alerts/${id}`,
+
     // AI
     AI_ANALYZE: (symbol) => `${API_BASE}/api/ai/analyze/${symbol}`,
+
+    // Watchlist
+    WATCHLIST: `${API_BASE}/api/watchlist`,
+    WATCHLIST_ITEM: (symbol) => `${API_BASE}/api/watchlist/${symbol}`,
+
 
     // Health check
     HEALTH: `${API_BASE}/api/health`,
