@@ -1,102 +1,191 @@
+import os
 import random
 from typing import Dict
 from .stock_service import cached_stock_data, get_full_stock_data
 import yfinance as yf
+import google.generativeai as genai
+from dotenv import load_dotenv
+import json
+
+# Load environment variables
+load_dotenv()
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
 
 async def analyze_stock(symbol: str) -> Dict:
     """
-    Generate an AI-style analysis of the stock based on technical indicators.
+    Generate an AI-style analysis of the stock.
+    Prioritizes Gemini LLM if configured, otherwise falls back to Expert System.
     """
     # 1. Get Data
     stock = cached_stock_data.get(symbol)
     if not stock:
-        # Try to fetch if not in cache (e.g. user clicked a new stock)
         try:
-           ticker = yf.Ticker(symbol if symbol.endswith('.NS') else f"{symbol}.NS")
-           stock = get_full_stock_data(symbol, ticker)
+            ticker = yf.Ticker(symbol if symbol.endswith('.NS') else f"{symbol}.NS")
+            stock = get_full_stock_data(symbol, ticker)
         except:
-           pass
+            pass
     
     if not stock:
         return {
             "summary": "Data Unavailable",
-            "details": f"I couldn't retrieve enough data for {symbol} to perform an analysis.",
+            "details": f"I couldn't retrieve enough data for {symbol} to perform an analysis. Please try again later.",
             "sentiment": "NEUTRAL"
         }
 
-    # 2. Extract Key Metrics
-    technicals = stock.get('technicals', {})
-    rsi = technicals.get('rsi', 50)
-    # macd = technicals.get('macd') # MACD not currently available in cache
-    signal = technicals.get('signal', 'Hold')
-    price = stock.get('price', 0)
-    sma = technicals.get('sma', price) # Fallback if missing
-    shariah = stock.get('shariahStatus', 'Unknown')
-    
-    # 3. Logic Engine (The "Brain")
-    points = []
-    sentiment = "NEUTRAL"
-    score = 0
-    
-    # RSI Logic
-    if rsi > 70:
-        points.append(f"The RSI is currently at {rsi}, indicating the stock is **Overbought**. This often suggests a pullback or correction might be coming soon.")
-        score -= 1
-    elif rsi < 30:
-        points.append(f"The RSI is very low at {rsi} (**Oversold**). This is typically a buying opportunity as the stock may be undervalued.")
-        score += 1
-    elif 45 < rsi < 55:
-        points.append(f"The RSI is neutral ({rsi}), showing no strong momentum in either direction.")
-    elif rsi >= 60:
-        points.append(f"RSI is climbing ({rsi}), showing growing bullish momentum.")
-        score += 0.5
+    # 2. Decide Analysis Method
+    if GEMINI_API_KEY:
+        try:
+             return await generate_gemini_analysis(stock, symbol)
+        except Exception as e:
+             print(f"Gemini API failed, falling back to expert system: {e}")
+             return generate_expert_analysis(stock)
     else:
-        points.append(f"RSI is cooling down ({rsi}), suggesting bearish pressure.")
-        score -= 0.5
+        return generate_expert_analysis(stock)
 
-    # Signal Logic
-    if signal == "Buy":
-        points.append("Our algo model indicates a **Buy Signal** based on trend and momentum.")
-        score += 1.5
-    elif signal == "Sell":
-        points.append("Our algo model indicates a **Sell Signal**.")
-        score -= 1.5
-    else:
-        points.append(f"The current signal is **{signal}**, suggesting to wait for a clearer trend.")
-        
-    # Shariah Logic
-    if shariah == "Halal":
-        points.append("✅ This stock passes all **Shariah Screening** criteria (Debt & Cash ratios are within limits).")
-    else:
-        points.append("❌ Warning: This stock is **Non-Halal** based on financial ratios. Muslim investors should avoid this.")
-        score = -10 # Override sentiment
-        
-    # 4. Generate Summary
-    if score >= 1.5:
-        sentiment = "BULLISH"
-        summary = f"Strong Buy Signal for {stock['name']}"
-    elif score <= -1.5:
-        sentiment = "BEARISH"
-        summary = f"Sell/Avoid Signal for {stock['name']}"
-    else:
-        sentiment = "NEUTRAL"
-        summary = f"Hold / Watch {stock['name']}"
-        
-    # 5. Final Formatting
-    intro = f"I've analyzed the technicals for **{stock['name']} ({stock['symbol']})**."
+
+async def generate_gemini_analysis(stock: Dict, symbol: str) -> Dict:
+    """Use Google Gemini to generate investment analysis"""
     
-    # Random "AI" flavor text
-    flavor = random.choice([
-        "Based on the patterns, here is my assessment:",
-        "My algorithms have detected the following:",
-        "Looking at the indicators, here's what stands out:"
-    ])
+    price = stock.get('price', 0)
+    technicals = stock.get('technicals', {})
+    shariah = stock.get('shariah', {})
+    analysis = stock.get('analysis', {})
+
+    # Construct Prompt
+    prompt = f"""
+    You are an expert Islamic Investment Analyst for 'HalalTrade Pro'. 
+    Analyze the stock {symbol} based on the following technical and fundamental data.
+
+    **Market Data:**
+    - Price: {price}
+    - RSI (14): {technicals.get('rsi', 'N/A')}
+    - MACD: {analysis.get('macd', 'N/A')} (Signal: {analysis.get('macd_signal', 'N/A')})
+    - 50 SMA: {analysis.get('sma50', 'N/A')}
+    - 200 SMA: {analysis.get('sma200', 'N/A')}
+    - Volume: {analysis.get('volume', 'N/A')}
+
+    **Shariah Compliance:**
+    - Status: {stock.get('shariahStatus', 'Unknown')}
+    - Debt Ratio: {shariah.get('debtRatio', 'N/A')}%
+    - Non-Halal Income: {shariah.get('impureRatio', 'N/A')}%
+    - Reason: {stock.get('shariahReason', '')}
+
+    **Task:**
+    1. Provide a "Verdict" (BUY, SELL, or HOLD).
+    2. Write a concise "Executive Summary" (2-3 sentences).
+    3. Provide "Detailed Analysis" in markdown bullet points, covering Trend, Momentum, and Shariah Safety. Used bolding for key terms.
+    4. Maintain a professional, objective, yet helpful tone.
+    5. Be explicit about Shariah compliance.
+
+    **Output Format (JSON):**
+    {{
+        "sentiment": "BUY/SELL/HOLD",
+        "summary": "...",
+        "details": "..."
+    }}
+    """
+
+    model = genai.GenerativeModel('gemini-pro')
+    response = model.generate_content(prompt)
     
-    full_text = f"{intro} {flavor}\n\n• " + "\n• ".join(points)
+    try:
+        text = response.text.replace('```json', '').replace('```', '')
+        data = json.loads(text)
+        return data
+    except Exception as e:
+        return {
+            "sentiment": "NEUTRAL", 
+            "summary": "AI Generated Analysis", 
+            "details": response.text
+        }
+
+
+def generate_expert_analysis(stock: Dict) -> Dict:
+    """Legacy Rule-Based Logic (The 'Expert System')"""
     
+    price = stock.get('price', 0)
+    technicals = stock.get('technicals', {})
+    analysis = stock.get('analysis', {})
+    shariah_status = stock.get('shariahStatus', 'Unknown')
+    
+    rsi = technicals.get('rsi', 50)
+    sma20 = analysis.get('sma20', price)
+    sma50 = analysis.get('sma50', price)
+    sma200 = analysis.get('sma200', price)
+    macd_val = analysis.get('macd', 0)
+    macd_signal = analysis.get('macd_signal', 0)
+    bb_upper = analysis.get('bb_upper', price * 1.1)
+    bb_lower = analysis.get('bb_lower', price * 0.9)
+    
+    points = []
+    sentiment_score = 0
+    
+    trend_msg = ""
+    if price > sma200:
+        trend_msg = "The stock is in a **Long-Term Uptrend** (Price > 200 SMA)."
+        sentiment_score += 1
+        if price > sma50 and sma50 > sma200:
+            trend_msg += " Ideally positioned with a strong bullish structure."
+            sentiment_score += 1
+    elif price < sma200:
+        trend_msg = "The stock is in a **Long-Term Downtrend** (Price < 200 SMA)."
+        sentiment_score -= 1
+        if price < sma50:
+            trend_msg += " Short-term weakness is also visible."
+            sentiment_score -= 1
+            
+    points.append(f"📉 **Trend**: {trend_msg}")
+    
+    momentum_msg = []
+    if rsi > 70:
+        momentum_msg.append(f"RSI is **Overbought** ({rsi}), suggesting a potential pullback.")
+        sentiment_score -= 0.5
+    elif rsi < 30:
+        momentum_msg.append(f"RSI is **Oversold** ({rsi}), suggesting the stock is undervalued.")
+        sentiment_score += 1
+    else:
+        momentum_msg.append(f"RSI is Neutral ({rsi}).")
+        
+    if macd_val > macd_signal:
+        momentum_msg.append("MACD is **Bullish** (above signal line).")
+        sentiment_score += 0.5
+    else:
+        momentum_msg.append("MACD is **Bearish** (below signal line).")
+        sentiment_score -= 0.5
+        
+    points.append(f"🚀 **Momentum**: {' '.join(momentum_msg)}")
+    
+    if price >= bb_upper * 0.99:
+        points.append("⚠️ Price near **Upper Bollinger Band** (Resistance).")
+    elif price <= bb_lower * 1.01:
+        points.append("✅ Price near **Lower Bollinger Band** (Support).")
+    else:
+        points.append(f"📊 **Volatility**: Price is trading within the normal volatility bands.")
+
+    # Shariah Check in Expert Logic
+    if shariah_status == 'Non-Halal':
+        points.append("❌ **Shariah**: This stock is Non-Halal. Trading is prohibited.")
+        sentiment_score = -10
+    elif shariah_status == 'Halal':
+        points.append("✅ **Compliance**: This stock passes all Shariah screening criteria.")
+
+    if sentiment_score >= 1.5:
+        verdict = "BUY"
+        summary_text = "Strong technicals suggest a buying opportunity."
+    elif sentiment_score <= -1.5:
+        verdict = "SELL"
+        summary_text = "Technical weakness suggests avoiding or selling."
+    else:
+        verdict = "HOLD"
+        summary_text = "Mixed signals. Wait for clearer direction."
+
     return {
-        "summary": summary,
-        "details": full_text,
-        "sentiment": sentiment,
-        "score": score
+        "summary": summary_text,
+        "details": "\n\n".join(points),
+        "sentiment": verdict,
+        "score": sentiment_score
     }

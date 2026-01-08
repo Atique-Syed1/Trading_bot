@@ -144,3 +144,17 @@ def calculate_take_profit(price: float, rsi: float) -> float:
 def calculate_potential_gain(price: float, target: float) -> float:
     """Calculate potential gain percentage"""
     return round(((target - price) / price) * 100, 2)
+
+
+def calculate_volume_ma(volume: pd.Series, period: int = 20) -> pd.Series:
+    """
+    Calculate Volume Moving Average
+    
+    Args:
+        volume: Series of volume data
+        period: MA period (default 20)
+    
+    Returns:
+        Series of Volume MA
+    """
+    return volume.rolling(window=period).mean()

@@ -4,12 +4,13 @@ Stocks Router - Stock list management endpoints
 import pandas as pd
 from fastapi import APIRouter, UploadFile, File
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 from ..services.stock_service import (
     get_stock_list_info,
     set_stock_list,
     reset_stock_list,
+    get_stock_history,
     stock_metadata,
     active_stock_list
 )
@@ -27,6 +28,14 @@ class CustomStockList(BaseModel):
 def get_stock_list():
     """Get current active stock list"""
     return get_stock_list_info()
+
+@router.get("/history/{symbol}")
+def get_stock_history_endpoint(symbol: str, period: str = "1y"):
+    """Get historical OHLC data for a stock"""
+    data = get_stock_history(symbol, period)
+    if not data:
+        return {"error": "Data not found"}
+    return data
 
 
 @router.post("/upload")

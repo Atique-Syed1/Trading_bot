@@ -15,5 +15,8 @@ httpx>=0.25.0
 # File Upload Support
 python-multipart>=0.0.6
 
+# Database
+sqlmodel>=0.0.14
+
 # Optional: For production
 # gunicorn>=21.0.0
