@@ -16,6 +16,7 @@ from ..utils.indicators import (
     calculate_bollinger_bands, calculate_volume_ma, generate_rsi_signal,
     calculate_stop_loss, calculate_take_profit, calculate_potential_gain
 )
+from ..utils.cache import stock_data_cache, history_cache
 
 
 # In-memory state
@@ -100,6 +101,13 @@ def get_stock_history(symbol: str, period: str = "1y") -> list:
     1mo -> 1h interval
     others -> 1d interval
     """
+    # Check cache first
+    cache_key = f"{symbol}:{period}"
+    cached_data = history_cache.get(cache_key)
+    if cached_data is not None:
+        print(f"[Cache HIT] History for {symbol} ({period})")
+        return cached_data
+    
     try:
         # Map frontend period codes to yfinance codes
         period_map = {
@@ -143,7 +151,11 @@ def get_stock_history(symbol: str, period: str = "1y") -> list:
                 "close": item_value(row['Close']),
                 "volume": int(item_value(row['Volume']))
             })
-            
+        
+        # Cache the result
+        history_cache.set(cache_key, formatted_data)
+        print(f"[Cache SET] History for {symbol} ({period})")
+        
         return formatted_data
         
     except Exception as e:

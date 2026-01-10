@@ -21,5 +21,8 @@ sqlmodel>=0.0.14
 # AI (Google Gemini)
 google-generativeai>=0.3.0
 
+# System Monitoring
+psutil>=5.9.0
+
 # Optional: For production
 # gunicorn>=21.0.0

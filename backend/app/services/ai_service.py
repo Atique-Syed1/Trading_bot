@@ -6,6 +6,7 @@ import yfinance as yf
 import google.generativeai as genai
 from dotenv import load_dotenv
 import json
+from ..utils.cache import ai_cache
 
 # Load environment variables
 load_dotenv()
@@ -20,6 +21,13 @@ async def analyze_stock(symbol: str) -> Dict:
     Generate an AI-style analysis of the stock.
     Prioritizes Gemini LLM if configured, otherwise falls back to Expert System.
     """
+    # Check cache first
+    cache_key = f"analysis:{symbol}"
+    cached_result = ai_cache.get(cache_key)
+    if cached_result is not None:
+        print(f"[Cache HIT] AI analysis for {symbol}")
+        return cached_result
+    
     # 1. Get Data
     stock = cached_stock_data.get(symbol)
     if not stock:
@@ -37,14 +45,21 @@ async def analyze_stock(symbol: str) -> Dict:
         }
 
     # 2. Decide Analysis Method
+    result = None
     if GEMINI_API_KEY:
         try:
-             return await generate_gemini_analysis(stock, symbol)
+             result = await generate_gemini_analysis(stock, symbol)
         except Exception as e:
              print(f"Gemini API failed, falling back to expert system: {e}")
-             return generate_expert_analysis(stock)
+             result = generate_expert_analysis(stock)
     else:
-        return generate_expert_analysis(stock)
+        result = generate_expert_analysis(stock)
+    
+    # Cache the result
+    ai_cache.set(cache_key, result)
+    print(f"[Cache SET] AI analysis for {symbol}")
+    
+    return result
 
 
 async def generate_gemini_analysis(stock: Dict, symbol: str) -> Dict:
