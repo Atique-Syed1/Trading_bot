@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 
 // Import components from subfolders
-import { ConnectionStatus, ExportButton, PWAInstallPrompt, NotificationToggle, PageLoadingSkeleton, ModalSkeleton } from './components/common';
+import { ConnectionStatus, ExportButton, PWAInstallPrompt, NotificationToggle, PageLoadingSkeleton, ModalSkeleton, LanguageSelector } from './components/common';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import { StockTable, WatchlistPanel, WatchlistIndicator } from './components/scanner';
 import { CommandPalette } from './components/common/CommandPalette';
@@ -366,6 +366,9 @@ const HalalTradeApp = () => {
 
                             {/* Notification Toggle */}
                             <NotificationToggle />
+
+                            {/* Language Selector */}
+                            <LanguageSelector />
 
                             {/* Dark Mode Toggle */}
                             <button

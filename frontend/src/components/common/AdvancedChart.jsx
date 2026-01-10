@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { createChart, ColorType } from 'lightweight-charts';
 import { Loader, TrendingUp, TrendingDown, CandlestickChart, LineChart, BarChart3, Maximize2, Minimize2 } from 'lucide-react';
 import API from '../../config/api';
+import ChartExport from './ChartExport';
 
 /**
  * ====================================================================
@@ -297,6 +298,13 @@ const AdvancedChart = ({
                     >
                         {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
                     </button>
+
+                    {/* Export Chart */}
+                    <ChartExport 
+                        chartRef={chartContainerRef} 
+                        filename={`${symbol?.replace('.NS', '')}-chart`}
+                        title={`${symbol?.replace('.NS', '')} - ${period.toUpperCase()} Chart`}
+                    />
                 </div>
             </div>
 
