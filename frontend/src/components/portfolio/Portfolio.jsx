@@ -274,3 +274,5 @@ const StatCard = ({ label, value, subValue, icon: Icon, color }) => {
         </div>
     );
 };
+
+export default Portfolio;

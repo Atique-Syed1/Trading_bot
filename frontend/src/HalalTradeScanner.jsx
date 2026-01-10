@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import {
     ShieldCheck,
     Search,
@@ -18,12 +18,22 @@ import {
 } from 'lucide-react';
 
 // Import components from subfolders
-import { ConnectionStatus, ExportButton, PWAInstallPrompt, NotificationToggle } from './components/common';
+import { ConnectionStatus, ExportButton, PWAInstallPrompt, NotificationToggle, PageLoadingSkeleton, ModalSkeleton } from './components/common';
 import ErrorBoundary from './components/common/ErrorBoundary';
-import { StockTable, StockDetailPanel, WatchlistPanel, WatchlistIndicator, CompareStocks } from './components/scanner';
-import { TelegramSettings, TelegramButton, StockListSettings, StockListButton, AlertSettings } from './components/settings';
-import { Portfolio } from './components/portfolio';
-import { Dashboard } from './components/dashboard';
+import { StockTable, WatchlistPanel, WatchlistIndicator } from './components/scanner';
+
+// Lazy load heavy components for code splitting
+const Dashboard = lazy(() => import('./components/dashboard/Dashboard'));
+const StockDetailPanel = lazy(() => import('./components/scanner/StockDetailPanel'));
+const CompareStocks = lazy(() => import('./components/scanner/CompareStocks'));
+const TelegramSettings = lazy(() => import('./components/settings/TelegramSettings'));
+const StockListSettings = lazy(() => import('./components/settings/StockListSettings'));
+const AlertSettings = lazy(() => import('./components/settings/AlertSettings'));
+const Portfolio = lazy(() => import('./components/portfolio/Portfolio'));
+
+// Import non-lazy settings buttons (small components - direct import)
+const TelegramButton = lazy(() => import('./components/settings/TelegramSettings').then(m => ({ default: m.TelegramButton })));
+const StockListButton = lazy(() => import('./components/settings/StockListSettings').then(m => ({ default: m.StockListButton })));
 
 // Import hooks
 import { useWatchlist } from './hooks/useWatchlist';
@@ -374,7 +384,9 @@ const HalalTradeApp = () => {
                 {activeTab === 'dashboard' ? (
                     <div className="max-w-7xl mx-auto">
                         <ErrorBoundary>
-                            <Dashboard onNavigateToScanner={() => setActiveTab('scanner')} />
+                            <Suspense fallback={<PageLoadingSkeleton />}>
+                                <Dashboard onNavigateToScanner={() => setActiveTab('scanner')} />
+                            </Suspense>
                         </ErrorBoundary>
                     </div>
                 ) : (
@@ -429,11 +441,13 @@ const HalalTradeApp = () => {
                             <div className="flex flex-col gap-4">
                                 {selectedStock ? (
                                     <ErrorBoundary>
-                                        <StockDetailPanel
-                                            stock={selectedStock}
-                                            useLiveMode={useLiveMode}
-                                            wsConnected={wsConnected}
-                                        />
+                                        <Suspense fallback={<PageLoadingSkeleton />}>
+                                            <StockDetailPanel
+                                                stock={selectedStock}
+                                                useLiveMode={useLiveMode}
+                                                wsConnected={wsConnected}
+                                            />
+                                        </Suspense>
                                     </ErrorBoundary>
                                 ) : (
                                     <EmptyDetailPanel />
@@ -455,46 +469,65 @@ const HalalTradeApp = () => {
                 onClear={clearWatchlist}
             />
 
-            {/* TELEGRAM SETTINGS MODAL */}
-            <TelegramSettings
-                isOpen={telegramOpen}
-                onClose={() => setTelegramOpen(false)}
-            />
+            {/* TELEGRAM SETTINGS MODAL - Lazy loaded */}
+            {telegramOpen && (
+                <Suspense fallback={<ModalSkeleton />}>
+                    <TelegramSettings
+                        isOpen={telegramOpen}
+                        onClose={() => setTelegramOpen(false)}
+                    />
+                </Suspense>
+            )}
 
-            {/* STOCK LIST SETTINGS MODAL */}
-            <StockListSettings
-                isOpen={stockListOpen}
-                onClose={() => setStockListOpen(false)}
-                onListChange={async () => {
-                    try {
-                        const res = await fetch(API.STOCKS_LIST);
-                        const data = await res.json();
-                        setUniverseInfo(data);
-                    } catch (err) {
-                        console.error("Failed to refresh stock list info", err);
-                    }
-                }}
+            {/* STOCK LIST SETTINGS MODAL - Lazy loaded */}
+            {stockListOpen && (
+                <Suspense fallback={<ModalSkeleton />}>
+                    <StockListSettings
+                        isOpen={stockListOpen}
+                        onClose={() => setStockListOpen(false)}
+                        onListChange={async () => {
+                            try {
+                                const res = await fetch(API.STOCKS_LIST);
+                                const data = await res.json();
+                                setUniverseInfo(data);
+                            } catch (err) {
+                                console.error("Failed to refresh stock list info", err);
+                            }
+                        }}
+                    />
+                </Suspense>
+            )}
 
-            />
+            {/* PORTFOLIO MODAL - Lazy loaded */}
+            {portfolioOpen && (
+                <Suspense fallback={<ModalSkeleton />}>
+                    <Portfolio
+                        isOpen={portfolioOpen}
+                        onClose={() => setPortfolioOpen(false)}
+                    />
+                </Suspense>
+            )}
 
-            {/* PORTFOLIO MODAL */}
-            <Portfolio
-                isOpen={portfolioOpen}
-                onClose={() => setPortfolioOpen(false)}
-            />
+            {/* ALERTS MODAL - Lazy loaded */}
+            {alertOpen && (
+                <Suspense fallback={<ModalSkeleton />}>
+                    <AlertSettings
+                        isOpen={alertOpen}
+                        onClose={() => setAlertOpen(false)}
+                    />
+                </Suspense>
+            )}
 
-            {/* ALERTS MODAL */}
-            <AlertSettings
-                isOpen={alertOpen}
-                onClose={() => setAlertOpen(false)}
-            />
-
-            {/* COMPARE MODAL */}
-            <CompareStocks
-                isOpen={compareOpen}
-                onClose={() => setCompareOpen(false)}
-                stocks={stocks}
-            />
+            {/* COMPARE MODAL - Lazy loaded */}
+            {compareOpen && (
+                <Suspense fallback={<ModalSkeleton />}>
+                    <CompareStocks
+                        isOpen={compareOpen}
+                        onClose={() => setCompareOpen(false)}
+                        stocks={stocks}
+                    />
+                </Suspense>
+            )}
 
             {/* PWA Install Prompt */}
             <PWAInstallPrompt />

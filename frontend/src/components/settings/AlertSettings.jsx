@@ -233,3 +233,5 @@ export const AlertSettings = ({ isOpen, onClose }) => {
         </div>
     );
 };
+
+export default AlertSettings;

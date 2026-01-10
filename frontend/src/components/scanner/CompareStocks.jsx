@@ -137,3 +137,5 @@ const Metric = ({ value, className = 'text-white' }) => (
         {value}
     </div>
 );
+
+export default CompareStocks;
