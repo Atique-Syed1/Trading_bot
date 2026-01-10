@@ -17,8 +17,8 @@ export default defineConfig({
         manualChunks: (id) => {
           // Node modules chunking
           if (id.includes('node_modules')) {
-            // React core
-            if (id.includes('react-dom') || id.includes('/react/')) {
+            // React core + icons (must be together to avoid initialization issues)
+            if (id.includes('react-dom') || id.includes('/react/') || id.includes('lucide-react')) {
               return 'vendor-react';
             }
             // Charts
@@ -27,10 +27,6 @@ export default defineConfig({
             }
             if (id.includes('recharts') || id.includes('d3-')) {
               return 'vendor-recharts';
-            }
-            // Icons
-            if (id.includes('lucide-react')) {
-              return 'vendor-icons';
             }
             // Export utilities
             if (id.includes('html2canvas')) {
