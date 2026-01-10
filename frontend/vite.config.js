@@ -11,6 +11,9 @@ export default defineConfig({
       clientPort: 5173,
     },
   },
+  optimizeDeps: {
+    include: ['lucide-react'],
+  },
   build: {
     rollupOptions: {
       output: {
