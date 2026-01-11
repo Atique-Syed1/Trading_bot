@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HalalTrade Pro - Shariah-Compliant Stock Scanner</title>
+    <meta name="description"
+        content="Advanced stock scanner with real-time analysis, AI insights, and halal screening. Track NSE stocks with Islamic finance compliance.">
+    <link rel="icon" type="image/svg+xml" href="./assets/icon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">
+                <div class="logo-icon">📈</div>
+                <span>HalalTrade Pro</span>
+            </a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#demo" class="btn btn-primary">Try Demo</a>
+            </div>
+            <button class="mobile-menu-btn" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg">
+            <div class="particles">
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+            </div>
+            <div class="gradient-orb orb-1"></div>
+            <div class="gradient-orb orb-2"></div>
+            <div class="gradient-orb orb-3"></div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-badge pulse">🌙 100% Shariah Compliant</div>
+            <h1>Trade with <span class="gradient-text animated-gradient">Confidence</span> & Faith</h1>
+            <p class="hero-description">
+                India's first AI-powered stock scanner designed for Muslim investors.
+                Get real-time halal screening, technical analysis, and smart portfolio tracking.
+            </p>
+            <div class="hero-cta">
+                <a href="#demo" class="btn btn-primary btn-large glow-effect">
+                    Start Free Trial
+                    <span class="btn-arrow">→</span>
+                </a>
+                <a href="#features" class="btn btn-secondary btn-large">
+                    Explore Features
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-value counter" data-target="500">500+</span>
+                    <span class="stat-label">NSE Stocks Screened</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">Live</span>
+                    <span class="stat-label">Real-time Updates</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">AI</span>
+                    <span class="stat-label">Powered Analysis</span>
+                </div>
+            </div>
+            <!-- Trust Badges -->
+            <div class="trust-badges">
+                <div class="trust-badge">
+                    <span class="trust-icon">🔒</span>
+                    <span>Secure & Encrypted</span>
+                </div>
+                <div class="trust-badge">
+                    <span class="trust-icon">📱</span>
+                    <span>Mobile Ready</span>
+                </div>
+                <div class="trust-badge">
+                    <span class="trust-icon">⚡</span>
+                    <span>Lightning Fast</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="dashboard-preview floating">
+                <div class="preview-header">
+                    <div class="preview-dots">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <span class="preview-title">HalalTrade Pro Dashboard</span>
+                    <div class="live-indicator">
+                        <span class="live-dot"></span>
+                        Live
+                    </div>
+                </div>
+                <div class="preview-content">
+                    <div class="preview-card green">
+                        <div class="preview-card-label">Portfolio Value</div>
+                        <div class="preview-card-value">₹12,45,678</div>
+                        <div class="preview-card-change positive">+12.5% ↑</div>
+                    </div>
+                    <div class="preview-card blue">
+                        <div class="preview-card-label">Today's P&L</div>
+                        <div class="preview-card-value">₹8,234</div>
+                        <div class="preview-card-change positive">+2.3% ↑</div>
+                    </div>
+                    <div class="preview-chart">
+                        <svg class="chart-line" viewBox="0 0 400 100" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:rgba(16, 185, 129, 0.4)" />
+                                    <stop offset="100%" style="stop-color:rgba(16, 185, 129, 0)" />
+                                </linearGradient>
+                            </defs>
+                            <path class="chart-area" d="M0,80 Q50,60 100,55 T200,45 T300,30 T400,20 L400,100 L0,100 Z"
+                                fill="url(#chartGradient)" />
+                            <path class="chart-path" d="M0,80 Q50,60 100,55 T200,45 T300,30 T400,20" stroke="#10b981"
+                                stroke-width="3" fill="none" />
+                        </svg>
+                    </div>
+                    <div class="preview-stocks">
+                        <div class="stock-ticker">
+                            <span class="ticker-symbol">TCS</span>
+                            <span class="ticker-price positive">+2.1%</span>
+                        </div>
+                        <div class="stock-ticker">
+                            <span class="ticker-symbol">INFY</span>
+                            <span class="ticker-price positive">+1.8%</span>
+                        </div>
+                        <div class="stock-ticker">
+                            <span class="ticker-symbol">HDFC</span>
+                            <span class="ticker-price negative">-0.5%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Mini Cards -->
+            <div class="mini-card mini-card-1 floating-delayed">
+                <span class="mini-icon">✓</span>
+                <span>Halal Verified</span>
+            </div>
+            <div class="mini-card mini-card-2 floating-delayed-2">
+                <span class="mini-icon">🤖</span>
+                <span>AI Analysis Ready</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Features</span>
+                <h2>Everything You Need for <span class="gradient-text">Halal Investing</span></h2>
+                <p>Powerful tools designed specifically for Shariah-compliant stock trading</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon green">🛡️</div>
+                    <h3>Shariah Screening</h3>
+                    <p>Automatic halal/non-halal classification for all NSE stocks based on Islamic finance principles
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon blue">📊</div>
+                    <h3>Real-time Scanner</h3>
+                    <p>Live price updates via WebSocket. Buy/Sell signals based on RSI, SMA, and technical indicators
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon purple">🤖</div>
+                    <h3>AI Analysis</h3>
+                    <p>Get AI-powered insights and recommendations for any stock with detailed explanations</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon orange">💼</div>
+                    <h3>Portfolio Tracking</h3>
+                    <p>Track your holdings, P&L, day's gain, and performance with beautiful analytics charts</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon pink">🔔</div>
+                    <h3>Smart Alerts</h3>
+                    <p>Set price alerts and get notified via Telegram when your target prices are hit</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon cyan">📈</div>
+                    <h3>Backtesting</h3>
+                    <p>Test your trading strategies on historical data before investing real money</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">How It Works</span>
+                <h2>Start Trading in <span class="gradient-text">3 Simple Steps</span></h2>
+            </div>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Scan the Market</h3>
+                    <p>Our scanner analyzes 500+ NSE stocks in real-time and filters only Shariah-compliant options</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Get AI Insights</h3>
+                    <p>Click on any stock to get detailed AI analysis, technical indicators, and buy/sell signals</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Track & Profit</h3>
+                    <p>Add to your portfolio, set alerts, and watch your halal investments grow over time</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Pricing</span>
+                <h2>Simple, <span class="gradient-text">Transparent</span> Pricing</h2>
+                <p>Start free, upgrade when you're ready</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Free</h3>
+                        <div class="price">₹0<span>/month</span></div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>✓ 50 Stocks Screening</li>
+                        <li>✓ Basic Technical Analysis</li>
+                        <li>✓ Portfolio Tracking</li>
+                        <li>✗ Real-time Updates</li>
+                        <li>✗ AI Analysis</li>
+                        <li>✗ Telegram Alerts</li>
+                    </ul>
+                    <a href="#demo" class="btn btn-secondary">Get Started</a>
+                </div>
+                <div class="pricing-card featured">
+                    <div class="pricing-badge">Most Popular</div>
+                    <div class="pricing-header">
+                        <h3>Pro</h3>
+                        <div class="price">₹499<span>/month</span></div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>✓ All 500+ Stocks</li>
+                        <li>✓ Advanced Technicals</li>
+                        <li>✓ Portfolio Analytics</li>
+                        <li>✓ Real-time Updates</li>
+                        <li>✓ AI Analysis (10/day)</li>
+                        <li>✓ Telegram Alerts</li>
+                    </ul>
+                    <a href="#demo" class="btn btn-primary">Start Free Trial</a>
+                </div>
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Enterprise</h3>
+                        <div class="price">Custom</div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>✓ Everything in Pro</li>
+                        <li>✓ Unlimited AI Analysis</li>
+                        <li>✓ Custom Screeners</li>
+                        <li>✓ API Access</li>
+                        <li>✓ Priority Support</li>
+                        <li>✓ White-label Option</li>
+                    </ul>
+                    <a href="mailto:contact@halaltrade.pro" class="btn btn-secondary">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Testimonials</span>
+                <h2>Trusted by <span class="gradient-text">Muslim Investors</span></h2>
+                <p>See what our community says about HalalTrade Pro</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"Finally a stock scanner that aligns with my Islamic values! The halal
+                        screening saves me hours of research. The AI analysis is incredibly accurate."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">AK</div>
+                        <div class="author-info">
+                            <strong>Ahmed Khan</strong>
+                            <span>Mumbai, India</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"The real-time alerts via Telegram are game-changing. I never miss a
+                        trading opportunity now. My portfolio has grown 40% in 6 months!"</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">FS</div>
+                        <div class="author-info">
+                            <strong>Fatima Syed</strong>
+                            <span>Hyderabad, India</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"As a beginner, the AI analyst feature is invaluable. It explains
+                        everything in simple terms. Best investment tool for Muslims in India."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">MR</div>
+                        <div class="author-info">
+                            <strong>Mohammed Raza</strong>
+                            <span>Delhi, India</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="faq">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">FAQ</span>
+                <h2>Frequently Asked <span class="gradient-text">Questions</span></h2>
+            </div>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h3>How is Shariah compliance determined?</h3>
+                    <p>We use established Islamic finance screening criteria including debt ratio, interest income, and
+                        business activity checks. Stocks are classified as Halal, Non-Halal, or Pending review.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Which exchanges are supported?</h3>
+                    <p>Currently we support NSE (National Stock Exchange of India) with 500+ actively traded stocks. BSE
+                        support is coming soon.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>How real-time are the prices?</h3>
+                    <p>Prices are updated in real-time via WebSocket connection during market hours. You'll see live
+                        prices with no delay.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Is my data secure?</h3>
+                    <p>Yes! We use industry-standard encryption. Your portfolio data is stored securely and never shared
+                        with third parties.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Can I use this on mobile?</h3>
+                    <p>Absolutely! HalalTrade Pro is a PWA (Progressive Web App) that works beautifully on mobile
+                        browsers. Install it like a native app.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>How does the AI analyst work?</h3>
+                    <p>Our AI analyzes technical indicators, price patterns, and market sentiment to provide actionable
+                        insights and recommendations for each stock.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="demo" class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Trade the <span class="gradient-text">Halal Way?</span></h2>
+                <p>Join thousands of Muslim investors making informed, Shariah-compliant investment decisions</p>
+                <a href="https://trading-bot-002.vercel.app/" class="btn btn-primary btn-large" target="_blank">
+                    🚀 Launch App Now
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="nav-logo">
+                        <div class="logo-icon">📈</div>
+                        <span>HalalTrade Pro</span>
+                    </div>
+                    <p>Making halal investing accessible, intelligent, and profitable.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Product</h4>
+                        <a href="#features">Features</a>
+                        <a href="#pricing">Pricing</a>
+                        <a href="#demo">Demo</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Legal</h4>
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Disclaimer</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Connect</h4>
+                        <a href="#">Twitter</a>
+                        <a href="#">LinkedIn</a>
+                        <a href="#">Email Us</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 HalalTrade Pro. All rights reserved.</p>
+                <p class="disclaimer">Investment involves risk. Past performance is not indicative of future results.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="auth-modal">
+        <div class="auth-modal-backdrop"></div>
+        <div class="auth-modal-content">
+            <button class="auth-close" onclick="closeAuthModal()">&times;</button>
+            <div class="auth-header">
+                <div class="auth-logo">📈</div>
+                <h2>Welcome to HalalTrade Pro</h2>
+                <p>Sign in to access your dashboard</p>
+            </div>
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchTab('login')">Login</button>
+                <button class="auth-tab" onclick="switchTab('signup')">Sign Up</button>
+            </div>
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="you@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-large auth-submit">
+                    Sign In
+                    <span class="btn-arrow">→</span>
+                </button>
+                <a href="#" class="forgot-password">Forgot password?</a>
+            </form>
+            <!-- Signup Form -->
+            <form id="signupForm" class="auth-form" style="display: none;" onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="signupName" placeholder="Your name" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="signupEmail" placeholder="you@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="signupPassword" placeholder="••••••••" minlength="6" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-large auth-submit">
+                    Create Account
+                    <span class="btn-arrow">→</span>
+                </button>
+            </form>
+            <div class="auth-divider">
+                <span>or continue with</span>
+            </div>
+            <button class="social-login-btn" onclick="handleGoogleLogin()">
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                    <path fill="#4285F4"
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="#34A853"
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path fill="#FBBC05"
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                    <path fill="#EA4335"
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                </svg>
+                Continue with Google
+            </button>
+            <p class="auth-terms">
+                By signing in, you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
