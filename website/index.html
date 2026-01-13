@@ -24,7 +24,11 @@
             <div class="nav-links">
                 <a href="#features">Features</a>
                 <a href="#how-it-works">How It Works</a>
+                <a href="#resources">Resources</a>
                 <a href="#pricing">Pricing</a>
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+                    <span class="theme-icon">🌙</span>
+                </button>
                 <a href="#demo" class="btn btn-primary">Try Demo</a>
             </div>
             <button class="mobile-menu-btn" aria-label="Menu">
@@ -290,6 +294,75 @@
                     </ul>
                     <a href="mailto:contact@halaltrade.pro" class="btn btn-secondary">Contact Us</a>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section id="resources" class="resources">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Resources</span>
+                <h2>Learn <span class="gradient-text">Halal Investing</span></h2>
+                <p>Free educational content to help you become a better Muslim investor</p>
+            </div>
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon">📚</div>
+                    <h3>Halal Investing 101</h3>
+                    <p>Understanding the basics of Shariah-compliant investing and Islamic finance principles.</p>
+                    <ul class="resource-topics">
+                        <li>What makes a stock halal?</li>
+                        <li>Financial ratio screening</li>
+                        <li>Purification methods</li>
+                    </ul>
+                    <a href="#" class="resource-link">Read Guide →</a>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">📊</div>
+                    <h3>Technical Analysis</h3>
+                    <p>Learn to read charts, identify patterns, and make data-driven trading decisions.</p>
+                    <ul class="resource-topics">
+                        <li>RSI & momentum indicators</li>
+                        <li>Support & resistance</li>
+                        <li>Candlestick patterns</li>
+                    </ul>
+                    <a href="#" class="resource-link">Start Learning →</a>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">💼</div>
+                    <h3>Portfolio Management</h3>
+                    <p>Build and manage a diversified halal investment portfolio for long-term growth.</p>
+                    <ul class="resource-topics">
+                        <li>Asset allocation</li>
+                        <li>Rebalancing strategies</li>
+                        <li>Dividend investing</li>
+                    </ul>
+                    <a href="#" class="resource-link">Explore →</a>
+                </div>
+                <div class="resource-card featured">
+                    <div class="resource-badge">New</div>
+                    <div class="resource-icon">🎓</div>
+                    <h3>Free Masterclass</h3>
+                    <p>Join our weekly live sessions on halal trading strategies and market analysis.</p>
+                    <ul class="resource-topics">
+                        <li>Live market analysis</li>
+                        <li>Q&A with experts</li>
+                        <li>Community support</li>
+                    </ul>
+                    <a href="#" class="resource-link btn btn-primary">Join Free →</a>
+                </div>
+            </div>
+            <!-- Newsletter Signup -->
+            <div class="newsletter-box">
+                <div class="newsletter-content">
+                    <h3>📧 Weekly Halal Stock Picks</h3>
+                    <p>Get curated halal stock recommendations delivered to your inbox every week.</p>
+                </div>
+                <form class="newsletter-form" onsubmit="handleNewsletterSignup(event)">
+                    <input type="email" placeholder="Enter your email" required>
+                    <button type="submit" class="btn btn-primary">Subscribe</button>
+                </form>
             </div>
         </div>
     </section>

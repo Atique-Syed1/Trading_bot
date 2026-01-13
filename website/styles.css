@@ -1569,3 +1569,227 @@ section {
 .auth-terms a:hover {
     text-decoration: underline;
 }
+
+/* ====================================================================
+   THEME TOGGLE
+   ==================================================================== */
+
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(15deg);
+}
+
+.theme-icon {
+    font-size: 1.2rem;
+}
+
+/* Light Theme */
+body.light-theme {
+    --bg-dark: #f8fafc;
+    --bg-darker: #e2e8f0;
+    --bg-card: rgba(255, 255, 255, 0.8);
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --border-color: rgba(0, 0, 0, 0.1);
+    --gradient-card: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(241,245,249,0.9));
+}
+
+body.light-theme .nav {
+    background: rgba(248, 250, 252, 0.9);
+}
+
+body.light-theme .hero-bg {
+    background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #f8fafc 100%);
+}
+
+body.light-theme .dashboard-preview {
+    background: white;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .auth-modal-content {
+    background: linear-gradient(145deg, rgba(255,255,255,0.98), rgba(241,245,249,0.98));
+}
+
+/* ====================================================================
+   RESOURCES SECTION
+   ==================================================================== */
+
+.resources {
+    background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+}
+
+.resources-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-bottom: 48px;
+}
+
+.resource-card {
+    padding: 28px;
+    background: var(--gradient-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.resource-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--primary);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.resource-card.featured {
+    border-color: var(--primary);
+    background: linear-gradient(145deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.02));
+}
+
+.resource-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 4px 10px;
+    background: var(--gradient-primary);
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.resource-icon {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+}
+
+.resource-card h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.resource-card p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+}
+
+.resource-topics {
+    list-style: none;
+    margin-bottom: 20px;
+}
+
+.resource-topics li {
+    padding: 6px 0;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.resource-topics li::before {
+    content: '→ ';
+    color: var(--primary);
+}
+
+.resource-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.resource-link:hover {
+    color: var(--primary-dark);
+}
+
+/* Newsletter Box */
+.newsletter-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    padding: 40px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(99, 102, 241, 0.1));
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 20px;
+}
+
+.newsletter-content h3 {
+    font-size: 1.25rem;
+    margin-bottom: 8px;
+}
+
+.newsletter-content p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.newsletter-form {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.newsletter-form input {
+    padding: 14px 20px;
+    width: 280px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.newsletter-form input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.newsletter-form input::placeholder {
+    color: var(--text-muted);
+}
+
+/* Resources Responsive */
+@media (max-width: 1024px) {
+    .resources-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .newsletter-box {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .newsletter-form {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .resources-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .newsletter-form {
+        flex-direction: column;
+    }
+    
+    .newsletter-form input {
+        width: 100%;
+    }
+}

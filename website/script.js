@@ -211,3 +211,53 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+// ====================================================================
+// THEME TOGGLE
+// ====================================================================
+
+function toggleTheme() {
+    const body = document.body;
+    const themeIcon = document.querySelector('.theme-icon');
+    
+    body.classList.toggle('light-theme');
+    
+    if (body.classList.contains('light-theme')) {
+        themeIcon.textContent = '☀️';
+        localStorage.setItem('halaltrade_theme', 'light');
+    } else {
+        themeIcon.textContent = '🌙';
+        localStorage.setItem('halaltrade_theme', 'dark');
+    }
+}
+
+// Load saved theme on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('halaltrade_theme');
+    const themeIcon = document.querySelector('.theme-icon');
+    
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-theme');
+        if (themeIcon) themeIcon.textContent = '☀️';
+    }
+});
+
+// ====================================================================
+// NEWSLETTER SIGNUP
+// ====================================================================
+
+function handleNewsletterSignup(e) {
+    e.preventDefault();
+    const email = e.target.querySelector('input[type="email"]').value;
+    
+    // Store email (in real app, send to backend/email service)
+    const subscribers = JSON.parse(localStorage.getItem('halaltrade_subscribers') || '[]');
+    if (!subscribers.includes(email)) {
+        subscribers.push(email);
+        localStorage.setItem('halaltrade_subscribers', JSON.stringify(subscribers));
+    }
+    
+    // Show success message
+    alert('🎉 Thanks for subscribing! You\'ll receive weekly halal stock picks.');
+    e.target.reset();
+}
