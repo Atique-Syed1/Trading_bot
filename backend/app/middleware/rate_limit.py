@@ -37,17 +37,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.minute_requests: Dict[str, list] = defaultdict(list)
         
     def _get_client_ip(self, request: Request) -> str:
-        """Extract client IP from request, handling proxies"""
-        # Check for forwarded headers (common in production behind proxy)
-        forwarded = request.headers.get("X-Forwarded-For")
-        if forwarded:
-            return forwarded.split(",")[0].strip()
-        
-        real_ip = request.headers.get("X-Real-IP")
-        if real_ip:
-            return real_ip
-            
-        return request.client.host if request.client else "unknown"
+        """Extract client IP from request"""
+        from ..utils.network_utils import get_client_ip
+        return get_client_ip(request)
     
     def _check_rate_limit(self, ip: str) -> Tuple[bool, str, int]:
         """
@@ -158,11 +150,8 @@ class EndpointRateLimiter:
     
     def _get_key(self, request: Request, endpoint: str) -> str:
         """Create a unique key per IP + endpoint"""
-        forwarded = request.headers.get("X-Forwarded-For")
-        if forwarded:
-            ip = forwarded.split(",")[0].strip()
-        else:
-            ip = request.client.host if request.client else "unknown"
+        from ..utils.network_utils import get_client_ip
+        ip = get_client_ip(request)
         return f"{ip}:{endpoint}"
     
     def check(self, request: Request, endpoint: str) -> bool:

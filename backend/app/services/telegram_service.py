@@ -116,4 +116,29 @@ def is_telegram_enabled(session: Session) -> bool:
     chat_id = settings_service.get_setting("tg_chat_id", session)
     enabled = settings_service.get_setting("tg_enabled", session) == "true"
     return enabled and bool(token) and bool(chat_id)
+async def format_and_send_alert(alert: "getattr", current_price: float, stock_data: Optional[dict] = None) -> None:
+    """Format and send an alert notification based on the alert type"""
+    try:
+        metric = getattr(alert, "metric", "PRICE")
+        symbol = alert.symbol
+        
+        if metric == "RSI":
+            # Extract RSI from stock_data if available
+            current_val = stock_data["technicals"].get("rsi", 0) if stock_data and "technicals" in stock_data else 0
+            target_display = f"{alert.target_price}"
+            current_display = f"{current_val}"
+            title = "RSI ALERT"
+        else:
+            current_val = current_price
+            target_display = f"₹{alert.target_price}"
+            current_display = f"₹{current_val}"
+            title = "PRICE ALERT"
 
+        msg = (f"🔔 *{title}*\n\n"
+               f"*{symbol}* is {alert.condition}\n"
+               f"Target: {target_display}\n"
+               f"Current: {current_display}")
+        
+        await send_telegram_message(msg)
+    except Exception as e:
+        print(f"[Telegram] Failed to send alert format: {e}")

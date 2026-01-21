@@ -32,94 +32,13 @@ start_time = time.time()
 # ====================================================================
 # WEBSOCKET CONNECTION MANAGER
 # ====================================================================
-class ConnectionManager:
-    def __init__(self):
-        self.active_connections: list[WebSocket] = []
-
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections.append(websocket)
-        print(f"[WS] Client connected. Total: {len(self.active_connections)}")
-
-    def disconnect(self, websocket: WebSocket):
-        if websocket in self.active_connections:
-            self.active_connections.remove(websocket)
-        print(f"[WS] Client disconnected. Total: {len(self.active_connections)}")
-
-    async def broadcast(self, message: dict):
-        disconnected = []
-        for connection in self.active_connections:
-            try:
-                await connection.send_json(message)
-            except Exception:
-                disconnected.append(connection)
-        
-        for conn in disconnected:
-            self.disconnect(conn)
-
-
-manager = ConnectionManager()
+from .services.websocket_manager import manager
 
 
 # ====================================================================
 # BACKGROUND PRICE UPDATER
 # ====================================================================
-async def price_updater():
-    """Background task to fetch prices, check alerts, and broadcast updates"""
-    from .services import alert_service, telegram_service
-    from .database import engine
-    from sqlmodel import Session
-    
-    while True:
-        try:
-            # Fetch live prices even if no clients connected (for alerts)
-            prices = await fetch_live_prices()
-            
-            if prices:
-                # 1. Check Alerts
-                try:
-                    with Session(engine) as session:
-                        triggered = alert_service.check_alerts(prices, session)
-                        for alert in triggered:
-                            print(f"🔔 ALERT TRIGGERED: {alert.symbol} {alert.condition} {alert.target_price}")
-                            # Send telegram notification
-                            try:
-                                metric = getattr(alert, "metric", "PRICE")
-                                
-                                if metric == "RSI":
-                                    from .services.stock_service import cached_stock_data
-                                    stock_data = cached_stock_data.get(alert.symbol.replace('.NS', '')) or cached_stock_data.get(alert.symbol)
-                                    current_val = stock_data["technicals"].get("rsi", 0) if stock_data else 0
-                                    target_display = f"{alert.target_price}"
-                                    current_display = f"{current_val}"
-                                    title = "RSI ALERT"
-                                else:
-                                    current_val = prices.get(alert.symbol, 0)
-                                    target_display = f"₹{alert.target_price}"
-                                    current_display = f"₹{current_val}"
-                                    title = "PRICE ALERT"
-
-                                msg = (f"🔔 *{title}*\n\n"
-                                       f"*{alert.symbol}* is {alert.condition}\n"
-                                       f"Target: {target_display}\n"
-                                       f"Current: {current_display}")
-                                await telegram_service.send_telegram_alert(msg)
-                            except Exception as tg_err:
-                                print(f"[Alert] Telegram failed: {tg_err}")
-                except Exception as alert_err:
-                    print(f"[Alert] Check failed: {alert_err}")
-
-                # 2. Broadcast to WebSocket clients
-                if manager.active_connections:
-                    await manager.broadcast({
-                        "type": "price_update",
-                        "data": prices
-                    })
-                    print(f"[WS] Broadcasted updates")
-        except Exception as e:
-            print(f"[Data] Update cycle error: {e}")
-        
-        await asyncio.sleep(WS_UPDATE_INTERVAL)
+from .services.background_tasks import price_updater
 
 
 # ====================================================================
@@ -155,8 +74,13 @@ async def lifespan(app: FastAPI):
         if 'updater_task' in locals() and not updater_task.done():
             updater_task.cancel()
     
-    # Shutdown
-    updater_task.cancel()
+    # Shutdown (if not handled by finally block for some reason)
+    try:
+        if 'updater_task' in locals() and not updater_task.done():
+            updater_task.cancel()
+    except Exception:
+        pass
+        
     print("\n👋 HalalTrade Pro API Shutting down...")
 
 

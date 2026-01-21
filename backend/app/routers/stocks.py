@@ -49,23 +49,21 @@ async def upload_stock_csv(file: UploadFile = File(...)):
         with open(temp_path, "wb") as f:
             f.write(contents)
         
-        # Parse CSV
-        df = pd.read_csv(temp_path)
-        if 'symbol' not in df.columns:
-            return {"success": False, "error": "CSV must have 'symbol' column"}
+        # Parse CSV using helper
+        from ..utils.csv_helper import parse_stock_csv
+        try:
+            stock_data_list = parse_stock_csv(temp_path)
+        except ValueError as e:
+            return {"success": False, "error": str(e)}
         
         symbols = []
-        for _, row in df.iterrows():
-            symbol = str(row['symbol']).strip()
-            if not symbol.endswith('.NS'):
-                symbol = f"{symbol}.NS"
-            symbols.append(symbol)
+        for item in stock_data_list:
+            symbols.append(item['symbol'])
             
             # Store metadata
-            clean = symbol.replace('.NS', '')
-            stock_metadata[clean] = {
-                'name': row.get('name', clean) if 'name' in df.columns else clean,
-                'sector': row.get('sector', 'Unknown') if 'sector' in df.columns else 'Unknown'
+            stock_metadata[item['clean_symbol']] = {
+                'name': item['name'],
+                'sector': item['sector']
             }
         
         if symbols:

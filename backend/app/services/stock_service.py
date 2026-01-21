@@ -34,29 +34,23 @@ live_prices = {} # New: global cache for live prices
 def load_csv_stocks() -> bool:
     """Load stocks from CSV file on startup"""
     global active_stock_list, stock_metadata
+    from ..utils.csv_helper import parse_stock_csv
     
     if not CSV_FILE.exists():
         print(f"[CSV] File not found: {CSV_FILE}")
         return False
     
     try:
-        df = pd.read_csv(CSV_FILE)
-        if 'symbol' not in df.columns:
-            print("[CSV] Invalid format: 'symbol' column required")
-            return False
+        stock_data_list = parse_stock_csv(str(CSV_FILE))
         
         symbols = []
-        for _, row in df.iterrows():
-            symbol = str(row['symbol']).strip()
-            if not symbol.endswith('.NS'):
-                symbol = f"{symbol}.NS"
-            symbols.append(symbol)
+        for item in stock_data_list:
+            symbols.append(item['symbol'])
             
             # Store metadata
-            clean = symbol.replace('.NS', '')
-            stock_metadata[clean] = {
-                'name': row.get('name', clean) if 'name' in df.columns else clean,
-                'sector': row.get('sector', 'Unknown') if 'sector' in df.columns else 'Unknown'
+            stock_metadata[item['clean_symbol']] = {
+                'name': item['name'],
+                'sector': item['sector']
             }
         
         if symbols:
